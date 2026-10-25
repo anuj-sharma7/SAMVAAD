@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+ * SAMVAAD design tokens.
+ * Contrast intent (WCAG AA, 4.5:1 for normal text):
+ *   ink-900 on paper, ink-600 on paper, teal-700 on white, amber-800 on amber-50,
+ *   red-700 on red-50, white on ink-900. Verified numerically in tests/contrast.test.ts.
+ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: #faf8f4;
+  --color-card: #ffffff;
+  --color-line: #e4dfd3;
+  --color-line-strong: #cfc8b8;
+
+  --color-ink-900: #0f1b33;
+  --color-ink-800: #1a2a4a;
+  --color-ink-700: #2a3d63;
+  --color-ink-600: #4b5a76;
+  --color-ink-500: #6b7791;
+  --color-ink-100: #e9ecf2;
+  --color-ink-50: #f3f5f9;
+
+  --color-teal-700: #0f6b63;
+  --color-teal-600: #138076;
+  --color-teal-100: #d5ede9;
+  --color-teal-50: #ebf6f4;
+
+  --color-amber-800: #8a4a07;
+  --color-amber-600: #b45f06;
+  --color-amber-100: #fbe8c4;
+  --color-amber-50: #fff6e3;
+
+  --color-red-700: #a42a1f;
+  --color-red-600: #c0392b;
+  --color-red-50: #fdecea;
+
+  --font-sans: var(--font-geist-sans), var(--font-devanagari), "Nirmala UI", "Mangal", "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink-900);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: -0.003em;
+  text-rendering: optimizeLegibility;
+}
+
+/* Devanagari needs a little more line height to avoid clipped matras. */
+:lang(hi) {
+  font-family: var(--font-devanagari), "Nirmala UI", "Mangal", var(--font-sans);
+  line-height: 1.75;
+  letter-spacing: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-teal-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-teal-100);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: the visit report page is print-friendly; hide app chrome. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .print-page {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-toast-in {
+  animation: toast-in 160ms ease-out;
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-ink-100) 0, var(--color-ink-50) 50%, var(--color-ink-100) 100%);
+  background-size: 200px 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.3s infinite linear;
+  border-radius: 6px;
 }

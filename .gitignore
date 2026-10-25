@@ -39,3 +39,31 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# keep the template, ignore real env files
+!.env.example
+
+# local database, uploads and private data
+/data/*.db
+/data/*.db-*
+/data/raw/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.wav
+*.mp3
+*.m4a
+*.opus
+/uploads/
+
+# test output
+/test-results/
+/playwright-report/
+/e2e-screenshots/
+
+# local safety snapshots
+/backups/
+
+# vitest cache
+/.vitest/

@@ -1,0 +1,279 @@
+{
+  "generated_at_utc": "2026-10-25T17:23:09.328Z",
+  "schema_version": "indicators_long/1",
+  "processed_files": [
+    {
+      "file": "data/processed/indicators_long.csv",
+      "bytes": 718315,
+      "sha256": "fdc41258566391e081e108f2793da60f72a10d8ca10e34199db86a6ca5d3ca05"
+    },
+    {
+      "file": "data/processed/indicator_definitions.csv",
+      "bytes": 11705,
+      "sha256": "b0fc4ec1a5efaf291ed90e85364ba46de88cb19987232327f514768dfb129d68"
+    },
+    {
+      "file": "data/processed/geographies.csv",
+      "bytes": 20050,
+      "sha256": "e44ead1df89f082bd70e98ed00180ab44130cdfa362863a82b50ba1e02d9bbc5"
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "udise_2024_25_booklet",
+      "access_status": "downloaded_and_validated",
+      "sha256": "cc66d03e1413722d2f5ab66f29ece3cdb3c21f7d736ac63f21efc3696ed7f4bf",
+      "row_count": 999
+    },
+    {
+      "source_id": "udise_2025_26_booklet",
+      "access_status": "downloaded_and_validated",
+      "sha256": "f20bfc4296acdb0f84a36f65587002c7899272ea67b6d91497a172a76982d9c4",
+      "row_count": 999
+    },
+    {
+      "source_id": "pib_udise_2025_26_release",
+      "access_status": "public_page_only",
+      "sha256": "0306f313394f321e58493d6ada0e07797bd5d83ce8cbc10cc8b545b38b47a8c5",
+      "row_count": null
+    },
+    {
+      "source_id": "udise_report_module",
+      "access_status": "unavailable",
+      "sha256": null,
+      "row_count": null
+    },
+    {
+      "source_id": "dsel_education_documents_page",
+      "access_status": "public_page_only",
+      "sha256": "343c18a8e931898b591903da44e0028af82ecaab36829ace68745ff384ef21a9",
+      "row_count": null
+    },
+    {
+      "source_id": "udise_microdata_portal",
+      "access_status": "registration_or_request_required",
+      "sha256": "8653fa747d96a1d56da8550aa8c7dc04df0e766184e15d30c53fcf9c618c76a1",
+      "row_count": null
+    },
+    {
+      "source_id": "dsel_statistics_page",
+      "access_status": "public_page_only",
+      "sha256": "8f4e8102752808c227c01e8c8aad3b30f9467fe438a8895077a1f740eea7ccf4",
+      "row_count": null
+    },
+    {
+      "source_id": "ogd_udise_2023_24_infra_table_2_5",
+      "access_status": "manual_download_needed",
+      "sha256": null,
+      "row_count": null
+    },
+    {
+      "source_id": "ogd_udise_catalog",
+      "access_status": "public_page_only",
+      "sha256": "66524ba5919875ac0272ea63cdc51f72a85d276d65de8a3528edebe3d4594ac2",
+      "row_count": null
+    },
+    {
+      "source_id": "rj_shaladarpan_school_reports",
+      "access_status": "captcha_or_interaction_blocked",
+      "sha256": "376bc268086ad9f5935e7b990f0b84152079372dcdb3a9738f74f2f284d15a62",
+      "row_count": null
+    },
+    {
+      "source_id": "aser_2024_national_findings",
+      "access_status": "report_downloaded",
+      "sha256": "79ee94e08136a42fd9640c35160abf304ac8f8ce699d58751ba887c8292c7643",
+      "row_count": null
+    },
+    {
+      "source_id": "aser_2024_rajasthan_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "0d63d984b8831caf4ba2e45f9c83598201244e7ed58571c6dd4f67956f4c0ceb",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_rajasthan_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "e253a7071ef133b3a9e045cde39823fd71bbd12eafb8defdbd9cbbde9fac15f8",
+      "row_count": 204
+    },
+    {
+      "source_id": "aser_2024_rajasthan_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "64e54ebd4e6ea8dc767ab1ccab377a3402ee1c73ccb9a4fce3f338aa05470638",
+      "row_count": 144
+    },
+    {
+      "source_id": "aser_2024_gujarat_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "5b2bcd70342aac9d793dce9eb5ecd4f9ca89cc829cdba2451e098aa44014a6c6",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_haryana_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "8a177a7b2a22efc04f286d68c2a04c12cb21eff61d7b19e1ebf00bf212bd2476",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_uttar_pradesh_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "e323716352e866c97d138ebb4279b45b321ee3c1a52596e950e7d86b3d3e6326",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_madhya_pradesh_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "22748360e1df173985a87f8a24aad7b492f3b5aa525c0d940ba4e9cf78e6afb1",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_bihar_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "855bcc7adc2e86b224fc80ef1de9b089339728516cfafbe07137d9f43a6c014a",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_punjab_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "df623e07f000a978701c762f7d4d0872e8f596344caf609265b1881ec4e3d427",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_uttarakhand_state",
+      "access_status": "downloaded_and_validated",
+      "sha256": "d440e201f6cec1241d8afbdb3e6ec9639f857009f9bd9ac63c4db3389768e2ee",
+      "row_count": 10
+    },
+    {
+      "source_id": "aser_2024_gujarat_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "57aed121cf1c705d06009d41fb9cf58b110689ff18c3d09f0344358cf4f8b171",
+      "row_count": 162
+    },
+    {
+      "source_id": "aser_2024_haryana_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "776bad78e667253c1c616b9826be6f35666fda72996c44551391872863df39ba",
+      "row_count": 132
+    },
+    {
+      "source_id": "aser_2024_uttar_pradesh_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "f2ddf06acbd432497451b43703272d7a845949467f8d08329df422a667e0f451",
+      "row_count": 426
+    },
+    {
+      "source_id": "aser_2024_madhya_pradesh_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "ac3e4880f954fc7f47f82ad78bef3a1c88e9e3d03b8dedd141745d42cca3268e",
+      "row_count": 306
+    },
+    {
+      "source_id": "aser_2024_bihar_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "350261153fba65160b431eb0656cc57dfb2f7a6653ad8eb776cae2716c4bb022",
+      "row_count": 234
+    },
+    {
+      "source_id": "aser_2024_uttarakhand_district",
+      "access_status": "downloaded_and_validated",
+      "sha256": "26534cb094bebfe6c788098dd84ab4fbced7f4a27ff84e45da4942856d29496c",
+      "row_count": 78
+    },
+    {
+      "source_id": "aser_2024_gujarat_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "6f96c189b351348fc32ec062a1d537912d06a9ec019a1f2eb7f81a3b52290f57",
+      "row_count": 90
+    },
+    {
+      "source_id": "aser_2024_haryana_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "5280e53f16086a4eadd6f89158d55e872c5e051d3be920d5b59d08ca16df55a4",
+      "row_count": 126
+    },
+    {
+      "source_id": "aser_2024_uttar_pradesh_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "ddaff923536a985b81ec27a7f8f60155fb3d6a08418efac72f40268315facbcb",
+      "row_count": 342
+    },
+    {
+      "source_id": "aser_2024_madhya_pradesh_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "b4258bc688dcc580191fd3b864ea638aa0b76ec629b1d9b5c3113e2937d5eaaf",
+      "row_count": 180
+    },
+    {
+      "source_id": "aser_2024_bihar_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "ed4d4c6f48f5786ee5362098407b4e7b5d32ce8e1b8e555483116a1cb688cac4",
+      "row_count": 180
+    },
+    {
+      "source_id": "aser_2024_punjab_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "8a42b6efa28fa66676b4cc49d32c96b960e2ed4d67227e892aa7ca373414a257",
+      "row_count": 108
+    },
+    {
+      "source_id": "aser_2024_uttarakhand_divisional",
+      "access_status": "downloaded_and_validated",
+      "sha256": "6026be16add8e88d4eeb3624eea09aae791d326f2efea1963840e43cb5d4fa75",
+      "row_count": 54
+    },
+    {
+      "source_id": "parakh_nas_dashboard_page",
+      "access_status": "public_page_only",
+      "sha256": "88d77262257caaae03319d25f938695418066139bf4121305f42c41402198a89",
+      "row_count": null
+    },
+    {
+      "source_id": "ncert_nas_2021_state_report",
+      "access_status": "unavailable",
+      "sha256": null,
+      "row_count": null
+    },
+    {
+      "source_id": "ncert_nipun_stakeholder_roles",
+      "access_status": "unavailable",
+      "sha256": null,
+      "row_count": null
+    },
+    {
+      "source_id": "ncert_vidya_pravesh",
+      "access_status": "unavailable",
+      "sha256": null,
+      "row_count": null
+    },
+    {
+      "source_id": "kb_nipun_bharat_guidelines",
+      "access_status": "downloaded_and_validated",
+      "sha256": "496edd51fb995592452d86f1ba67c50fce2a50405e65945d4221c69e0b2145d6",
+      "row_count": 19
+    },
+    {
+      "source_id": "dsel_nipun_stakeholder_roles",
+      "access_status": "unavailable",
+      "sha256": null,
+      "row_count": null
+    },
+    {
+      "source_id": "diksha_public_datasets_page",
+      "access_status": "public_page_only",
+      "sha256": "85be1a3b5189b09b9b5596ecc9f36bf413fbf249b94264f6ba3200c2ad185580",
+      "row_count": null
+    }
+  ],
+  "validation": {
+    "validated_at_utc": "2026-10-25T17:23:03.592Z",
+    "checks_total": 53,
+    "checks_passed": 53,
+    "failures": [],
+    "warnings": [
+      "ASER madhya_pradesh: divisional file has no state-total row; cross-check skipped",
+      "ASER punjab: no district-estimates file exists/parsed for this state; district-vs-divisional cross-check skipped"
+    ]
+  }
+}

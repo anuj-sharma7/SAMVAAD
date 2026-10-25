@@ -1,0 +1,20 @@
+const m = {
+  "nav.dashboard": "Dashboard",
+  "nav.schools": "Schools",
+  "nav.visits": "Visits",
+  "nav.feedback": "Feedback",
+  "nav.demonstrations": "Demonstrations",
+  "nav.followUps": "Follow-ups",
+  "nav.reports": "Reports",
+  "nav.publicContext": "Public context",
+  "nav.practiceLibrary": "Practice Library",
+  "nav.settings": "Settings",
+  "nav.help": "Help",
+  "nav.primary": "Primary",
+  "nav.open": "Open navigation",
+  "nav.close": "Close navigation",
+  "nav.drawer": "Navigation",
+  "nav.tagline": "संवाद · mentoring copilot",
+  "nav.signOut": "Switch persona / sign out",
+};
+export default m;

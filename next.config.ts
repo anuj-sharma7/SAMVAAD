@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Cache Components is intentionally off: every page here is per-user and DB-backed,
+  // so we want plain dynamic rendering rather than a prerendered shell.
   turbopack: {
     rules: {
       "*.css": {
@@ -12,6 +11,7 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  poweredByHeader: false,
 };
 
 export default nextConfig;

@@ -1,0 +1,131 @@
+{
+  "schema_version": "indicators_long/1",
+  "total_rows": 4844,
+  "outputs": {
+    "udise_2024_25_booklet": {
+      "rows": 999,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.484Z"
+    },
+    "udise_2025_26_booklet": {
+      "rows": 999,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.653Z"
+    },
+    "aser_2024_rajasthan_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.694Z"
+    },
+    "aser_2024_rajasthan_district": {
+      "rows": 204,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.707Z"
+    },
+    "aser_2024_rajasthan_divisional": {
+      "rows": 144,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.724Z"
+    },
+    "aser_2024_gujarat_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.751Z"
+    },
+    "aser_2024_gujarat_district": {
+      "rows": 162,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.764Z"
+    },
+    "aser_2024_gujarat_divisional": {
+      "rows": 90,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.774Z"
+    },
+    "aser_2024_haryana_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.794Z"
+    },
+    "aser_2024_haryana_district": {
+      "rows": 132,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.803Z"
+    },
+    "aser_2024_haryana_divisional": {
+      "rows": 126,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.813Z"
+    },
+    "aser_2024_uttar_pradesh_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.833Z"
+    },
+    "aser_2024_uttar_pradesh_district": {
+      "rows": 426,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.847Z"
+    },
+    "aser_2024_uttar_pradesh_divisional": {
+      "rows": 342,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.866Z"
+    },
+    "aser_2024_madhya_pradesh_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.885Z"
+    },
+    "aser_2024_madhya_pradesh_district": {
+      "rows": 306,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.894Z"
+    },
+    "aser_2024_madhya_pradesh_divisional": {
+      "rows": 180,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.905Z"
+    },
+    "aser_2024_bihar_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.923Z"
+    },
+    "aser_2024_bihar_district": {
+      "rows": 234,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.933Z"
+    },
+    "aser_2024_bihar_divisional": {
+      "rows": 180,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.943Z"
+    },
+    "aser_2024_punjab_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.968Z"
+    },
+    "aser_2024_punjab_divisional": {
+      "rows": 108,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.979Z"
+    },
+    "aser_2024_uttarakhand_state": {
+      "rows": 10,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:44.998Z"
+    },
+    "aser_2024_uttarakhand_district": {
+      "rows": 78,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:45.005Z"
+    },
+    "aser_2024_uttarakhand_divisional": {
+      "rows": 54,
+      "problems": [],
+      "parsed_at_utc": "2026-10-25T17:18:45.012Z"
+    }
+  }
+}

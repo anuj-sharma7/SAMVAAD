@@ -1,0 +1,197 @@
+{
+  "source_id": "kb_nipun_bharat_guidelines",
+  "source_sha256": "496edd51fb995592452d86f1ba67c50fce2a50405e65945d4221c69e0b2145d6",
+  "extracted_at_utc": "2026-10-25T16:17:27.394Z",
+  "chunks": [
+    {
+      "chunk_id": "NBG-p6-readaloud",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 6,
+      "printed_page": 4,
+      "text": "Read-aloud is a practice where teachers, parents, and caregivers pick up an engaging story from a book and reads it out. Variations in pitch, tone, pace, volume, pauses, eye contact, questions, and comments make for a fluent and enjoyable delivery. Reading aloud engages the creativity and imagination of children along with increasing their attention span and ability to focus.",
+      "text_sha256": "1c28ba92a241acdee484ab16f1b1dce6c99ed699919d8b1875960464cf92a8f9",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p6-sharedreading",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 6,
+      "printed_page": 4,
+      "text": "In shared reading, the teacher holds one big book up and the whole class reads from the same book. The book has large font, illustrations, and simple text so that all children can participate in reading. The teacher reads the text while children join when they recognise a word from illustrations, sight word, or memory. Children start developing the concept of print.",
+      "text_sha256": "139e3375028962497c51e70121173eb81861b06f71d37a41f740fd8166e3e319",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p76-stories",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 76,
+      "printed_page": 74,
+      "text": "Good stories deserve many re-tellings. Discussion on the story can be initiated on the messages, perceptions, impressions which children gather from the story. The freedom to recreate a story and its characters in a way that is meaningful to child should be promoted. A teacher should create opportunities for children to talk about a story in any way they like, to extend it, substitute its characters, and to make up their own stories",
+      "text_sha256": "3568de754ab30c1f49aa01b374df6b2c8f23d1683d7205e02252aedcd041d800",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p120-readaloud-questions",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 120,
+      "printed_page": 118,
+      "text": "The read aloud and picture reading provide opportunities for learning new words, critical thinking skills etc. Asking questions are some of the especially important strategies to strengthen language and early literacy. When children engage in meaningful literacy activities with purposeful instruction, they develop listening, speaking, reading, and writing skills that enable them to be effective communicators.",
+      "text_sha256": "c7fb818d722135741893e49646066006ddf4349293403978bd836a2041e001e0",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p120-interaction",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 120,
+      "printed_page": 118,
+      "text": "A good teacher would be friendly and interactive with all her/his learners, such as ask questions regarding their creation/activity individually to help them extend their thinking and encourage conversation. She should not be intrusive or directive in her approach, rather allow for learner’s initiative and imagination to flourish and encourage them to express freely.",
+      "text_sha256": "ad805b97767140acfb82dbfb90f7f1dc5a296180a3e404d794ba4f5db47a4e55",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p146-learner-questions",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 146,
+      "printed_page": 144,
+      "text": "In addition to asking open ended questions to children, they may be encouraged to frame and ask questions.",
+      "text_sha256": "805c76290879c7b9bad434cc91730e8c631c527d22c8f66fa3d177cdb01c9670",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p146-participation",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 146,
+      "printed_page": 144,
+      "text": "Make activities and learning tasks more participatory in nature keeping in view of varied needs of children. • Encourage children to participate in classroom activities through asking questions and framing of problems. • Allow freedom of mobility to children in class while working in groups and reading from reading corner. • Encourage children to develop many informal strategies in dealing with problems related to numbers and measurement. • Opportunity to respond, discuss and share readings and books.",
+      "text_sha256": "0dad6527792e3c05dc4c0f0e0d2b994a0231a380df265ae9a3dc9832329a0def",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p69-gradual-release",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 69,
+      "printed_page": 67,
+      "text": "Explicit modelling of literacy practices should follow a “gradual release of responsibility model’ which incorporates a range of reading/writing activities for helping children develop literacy skills, such as Read aloud/Modelled writing, Shared reading/writing, Guided Reading and thus graduating to Independent Reading/Writing.",
+      "text_sha256": "2ab348d8789fdfe9aac1e8489a2d9d62ad84e84268e852ec282635f6f95572a5",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p69-comprehension",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 69,
+      "printed_page": 67,
+      "text": "Oral language and literacy development activities must therefore be planned concurrently for children as opposed to sequential approach, to help children not only learn to read but also make meaning of reading and read with comprehension.",
+      "text_sha256": "76121f73dc13cbf16de167aa259157b0932e43c0370831461428c17a054a176d",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p69-critical-thinking",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 69,
+      "printed_page": 67,
+      "text": "Language and early literacy education should lead to not only development of these skills and competencies but also to the development of critical thinking and reasoning.",
+      "text_sha256": "2a9dc2714f1fc707cb1d694e7ea0f27eb7b8ff396256ce58d5c3716ac2e4f143",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p78-literature",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 78,
+      "printed_page": 76,
+      "text": "Children need to be exposed to a range of children’s literature for independent reading, shared reading as well as read aloud. These are critical for children to develop sustained literacy skills as well as develop critical thinking, imagination and creativity.",
+      "text_sha256": "725e82cc393af64c5d83aff4b2eb7e34baafe87e4b5b54eafae4b219336f83e7",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p200-outcome-class1",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 200,
+      "printed_page": 198,
+      "text": "Participates during read aloud/story telling session in an active way and answers questions during and after story session; acts out familiar story with props and puppets",
+      "text_sha256": "3aaac0b425ad1f85e8eb59cee886d4e75958c5f4a4502ce34d809aeaa6816604",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p200-outcome-class2",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 200,
+      "printed_page": 198,
+      "text": "Reads and narrates/re-tells the stories from children’s literature/textbook.",
+      "text_sha256": "0ca513971f6d1070ff62b589bca84d20b66b31ca84d9a2ebf6ec7f82957fe799",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p89-counting-objects",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 89,
+      "printed_page": 87,
+      "text": "While teaching numbers, concept of groups of tens should be used using a variety of objects like sticks, pencils etc. • Involve children in matching and sorting objects using one-to-one correspondence and ordering objects that vary in colour, size, or other parameters • Encourage children to count different groups of objects and to think about quantity and number. • Use strategies that help children learn to count accurately and efficiently such as pointing to/touching/moving each object being counted.",
+      "text_sha256": "827dc42fcb51d56ec91206919d61ae4ddc9050b1ebd101d96b5f89e44c97f4d1",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p89-estimation",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 89,
+      "printed_page": 87,
+      "text": "Ask children to estimate or how many by looking at a group of objects. Encourage them to test for the actual answer.",
+      "text_sha256": "c228fd6e1b1a218574f643386cea710784deece294f3e1318456a9196207533a",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p97-experiential",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 97,
+      "printed_page": 95,
+      "text": "All activities and interaction with children should focus on experiential learning and use of manipulative and concrete material.",
+      "text_sha256": "33c159f588e74c8b7157ba552b5efb534a3c9d8bc8720208eb09c51c9ad062d5",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p97-communicate-no-fear",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 97,
+      "printed_page": 95,
+      "text": "Appropriate opportunities need to be provided to all children to communicate their ideas through newer terminology in a stress free and friendly environment. Initially children should attempt to use mathematical language without any fear of being wrong. Gradually they will improve their mathematical communication with time and concerted opportunities.",
+      "text_sha256": "31e6a6d7e30130a08dccc818f11e3d6cb644067cb9289e468e8881c801db0235",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p98-explore-strategies",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 98,
+      "printed_page": 96,
+      "text": "Different ways of calculations and strategies for problem-solving need to be explored (other than employing standard algorithms) along with many diverse ways of communicating the results of exploration.",
+      "text_sha256": "3ab2a75a577755eadff26ea6bb1f7a9523eb3a49d6e1cf3f13b3741dccf1b710",
+      "language": "en",
+      "review_status": "pending_review"
+    },
+    {
+      "chunk_id": "NBG-p98-manipulatives",
+      "kb_source_id": "kb_nipun_bharat_guidelines",
+      "pdf_page": 98,
+      "printed_page": 96,
+      "text": "Providing hands on experience is an integral part of mathematics, especially in the lower classes. It provides an implicit understanding of concepts in children which a child may not get when told explicitly. Toys and manipulatives also help children in visualising of concepts.",
+      "text_sha256": "7d4b0074988afe36a3f83d08c152bce8aa9033fc9ce2dc29169d44fff9b436b0",
+      "language": "en",
+      "review_status": "pending_review"
+    }
+  ]
+}

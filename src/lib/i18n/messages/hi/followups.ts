@@ -1,0 +1,32 @@
+import type en from "../en/followups";
+
+const m: Record<keyof typeof en, string> = {
+  "followups.meta.title": "फ़ॉलो-अप",
+  "followups.title": "फ़ॉलो-अप",
+  "followups.description": "शिक्षक के साथ आपके तय किए हर अगले कदम की सूची। अगली विज़िट में हर एक को जाँचें और जो देखा, वह दर्ज करें। अधूरा कदम सहयोग की ज़रूरत बताता है, यह कोई स्कोर नहीं है।",
+  "followups.filter.aria": "फ़ॉलो-अप छाँटें",
+  "followups.bucket.all": "सभी",
+  "followups.bucket.open": "आगे के",
+  "followups.empty.title": "यहाँ कुछ नहीं है",
+  "followups.empty.all": "विज़िट में आप जो अगले कदम तय करेंगे, वे यहाँ दिखेंगे।",
+  "followups.empty.group": "इस समूह में कोई फ़ॉलो-अप नहीं है।",
+  "followups.empty.showAll": "सभी दिखाएँ",
+  "followups.field.school": "स्कूल",
+  "followups.field.teacherOwner": "शिक्षक · ज़िम्मेदार",
+  "followups.field.lastVisit": "पिछली विज़िट (जब तय हुआ)",
+  "followups.field.checkBy": "जाँचने की तारीख",
+  "followups.field.evidence": "क्या देखना है",
+  "followups.field.nextVisit": "अगली विज़िट",
+  "followups.owner.teacher": "शिक्षक",
+  "followups.owner.head_teacher": "प्रधानाध्यापक",
+  "followups.owner.mentor": "मेंटर",
+  "followups.dateWithRelative": "{date} ({relative})",
+  "followups.notScheduled": "तय नहीं है · ",
+  "followups.planOne": "योजना बनाएँ",
+  "followups.recorded": "दर्ज किया गया {date}",
+  "followups.reviewEvidence": "जो देखा:",
+  "followups.reviewBarriers": "रुकावटें / ज़रूरी सहयोग:",
+  "followups.markDone": "शिक्षक के अनुसार हो गया",
+  "followups.markDoneSuccess": "शिक्षक ने इसे पूरा बताया है। अगली विज़िट में जाँचें।",
+};
+export default m;

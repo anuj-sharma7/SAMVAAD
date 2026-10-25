@@ -1,0 +1,25 @@
+{
+  "_comment": "Curated excerpt anchors for the knowledge base. Each entry names a PDF page and the first/last words of a passage. scripts/data/extract-kb.ts pulls the EXACT text from the downloaded PDF between those anchors (nothing is retyped) and fails if an anchor is missing. Selection was proposed by SAMVAAD's developer assistant; every excerpt starts as pending_review and is only usable after a human curator approves it.",
+  "source_id": "kb_nipun_bharat_guidelines",
+  "chunks": [
+    { "id": "NBG-p6-readaloud", "pdf_page": 6, "start": "Read-aloud is a practice where teachers, parents, and caregivers pick up an engaging story", "end": "increasing their attention span and ability to focus." },
+    { "id": "NBG-p6-sharedreading", "pdf_page": 6, "start": "In shared reading, the teacher holds one big book up", "end": "Children start developing the concept of print." },
+    { "id": "NBG-p76-stories", "pdf_page": 76, "start": "Good stories deserve many re-tellings.", "end": "make up their own stories" },
+    { "id": "NBG-p120-readaloud-questions", "pdf_page": 120, "start": "The read aloud and picture reading provide opportunities for learning new words", "end": "effective communicators." },
+    { "id": "NBG-p120-interaction", "pdf_page": 120, "start": "A good teacher would be friendly and interactive with all her/his learners", "end": "encourage them to express freely." },
+    { "id": "NBG-p146-learner-questions", "pdf_page": 146, "start": "In addition to asking open ended questions to children", "end": "frame and ask questions." },
+    { "id": "NBG-p146-participation", "pdf_page": 146, "start": "Make activities and learning tasks more participatory in nature", "end": "Opportunity to respond, discuss and share readings and books." },
+    { "id": "NBG-p69-gradual-release", "pdf_page": 69, "start": "Explicit modelling of literacy practices should follow", "end": "Independent Reading/Writing." },
+    { "id": "NBG-p69-comprehension", "pdf_page": 69, "start": "Oral language and literacy development activities must therefore be planned concurrently", "end": "read with comprehension." },
+    { "id": "NBG-p69-critical-thinking", "pdf_page": 69, "start": "Language and early literacy education should lead to not only development", "end": "critical thinking and reasoning." },
+    { "id": "NBG-p78-literature", "pdf_page": 78, "start": "Children need to be exposed to a range of children’s literature", "end": "imagination and creativity." },
+    { "id": "NBG-p200-outcome-class1", "pdf_page": 200, "start": "Participates during read aloud/story telling session in an active way", "end": "with props and puppets" },
+    { "id": "NBG-p200-outcome-class2", "pdf_page": 200, "start": "Reads and narrates/re-tells the stories", "end": "children’s literature/textbook." },
+    { "id": "NBG-p89-counting-objects", "pdf_page": 89, "start": "While teaching numbers, concept of groups of tens should be used", "end": "pointing to/touching/moving each object being counted." },
+    { "id": "NBG-p89-estimation", "pdf_page": 89, "start": "Ask children to estimate or how many by looking at a group of objects.", "end": "Encourage them to test for the actual answer." },
+    { "id": "NBG-p97-experiential", "pdf_page": 97, "start": "All activities and interaction with children should focus on experiential learning", "end": "use of manipulative and concrete material." },
+    { "id": "NBG-p97-communicate-no-fear", "pdf_page": 97, "start": "Appropriate opportunities need to be provided to all children to communicate their ideas", "end": "concerted opportunities." },
+    { "id": "NBG-p98-explore-strategies", "pdf_page": 98, "start": "Different ways of calculations and strategies for problem-solving need to be explored", "end": "diverse ways of communicating the results of exploration." },
+    { "id": "NBG-p98-manipulatives", "pdf_page": 98, "start": "Providing hands on experience is an integral part of mathematics", "end": "visualising of concepts." }
+  ]
+}

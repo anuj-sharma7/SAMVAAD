@@ -1,0 +1,20 @@
+const m = {
+  "login.metaTitle": "Sign in",
+  "login.tagline": "संवाद · dialogue",
+  "login.hero": "Turn every school visit into one coaching step that gets followed up.",
+  "login.intro": "SAMVAAD helps CRPs, BRPs, ARPs and NIPUN mentors move from what they observe in a classroom to one specific, practical next step with the teacher, grounded in an approved practice library, and checks it at the next visit.",
+  "login.workflowLabel": "The SAMVAAD workflow",
+  "login.principle": "The AI drafts; the mentor decides. SAMVAAD never scores or ranks teachers, and every suggestion cites an approved practice card.",
+  "login.title": "Open the prototype",
+  "login.subtitle": "Choose a fictional persona to explore SAMVAAD from that role’s point of view.",
+  "login.demoNoticeTitle": "Demo access, not production sign-in",
+  "login.demoNoticeBody": "This is a persona picker for the prototype. There are no passwords. A real deployment needs proper authentication before any real data is used.",
+  "login.disabledTitle": "Demo sign-in is disabled",
+  "login.disabledBody": "This server has DEMO_MODE=false and no real authentication is configured yet.",
+  "login.fictionalNote": "All schools, teachers and visits are fictional. Pilot targets in the deck are shown as targets, never as results.",
+  "login.blurb.mentor": "Plan visits, record observations, approve AI-drafted feedback, agree and follow up commitments.",
+  "login.blurb.supervisor": "See operational summaries and aggregate practice areas only (groups of 5 or more). No coaching notes.",
+  "login.blurb.diet_admin": "Curate and approve the practice-card library that every suggestion must cite.",
+  "login.signInFailed": "Could not sign in",
+};
+export default m;

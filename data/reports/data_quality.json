@@ -1,0 +1,410 @@
+{
+  "validated_at_utc": "2026-10-25T17:42:20.929Z",
+  "total_rows": 4844,
+  "suppressed_rows": 12,
+  "checks": [
+    {
+      "name": "schema: header matches",
+      "ok": true,
+      "detail": "got indicator_id,source_id,geography_level,state,area,reference_period,value,ci95_half_width,value_status,source_locator,notes"
+    },
+    {
+      "name": "rows: not empty",
+      "ok": true,
+      "detail": "no rows"
+    },
+    {
+      "name": "every indicator has a definition",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no duplicate (indicator, source, geography, period) rows",
+      "ok": true,
+      "detail": "0 duplicates, e.g. undefined"
+    },
+    {
+      "name": "value_status is one of reported/derived/suppressed",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "missing values are marked suppressed (never zero-filled)",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "every row has source_id, locator and reference period",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "UDISE+: 36 states/UTs + India present",
+      "ok": true,
+      "detail": "36 states"
+    },
+    {
+      "name": "UDISE+: udise_schools_total states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=1471473 india=1471473 diff=0"
+    },
+    {
+      "name": "UDISE+: udise_enrolment_total states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=246932680 india=246932680 diff=0"
+    },
+    {
+      "name": "UDISE+: udise_teachers_total states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=10122420 india=10122420 diff=0"
+    },
+    {
+      "name": "UDISE+: udise_single_teacher_schools states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=104125 india=104125 diff=0"
+    },
+    {
+      "name": "UDISE+: published PTR equals enrolment/teachers (within rounding)",
+      "ok": true,
+      "detail": "0 rows off by >1"
+    },
+    {
+      "name": "UDISE+: published averages equal totals ratios (within rounding)",
+      "ok": true,
+      "detail": "0 rows off by >1"
+    },
+    {
+      "name": "UDISE+: facility counts never exceed total schools",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "UDISE+: derived shares within 0-100",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "UDISE+: national internet share cross-checks with the deck's cited 63.5%",
+      "ok": true,
+      "detail": "computed 63.5"
+    },
+    {
+      "name": "UDISE+: Rajasthan row present with plausible values",
+      "ok": true,
+      "detail": "{\"schools\":106302,\"teachers\":792265}"
+    },
+    {
+      "name": "UDISE+ 2025-26: 36 states/UTs + India present",
+      "ok": true,
+      "detail": "36 states"
+    },
+    {
+      "name": "UDISE+ 2025-26: every row carries the 2025-26 reference period",
+      "ok": true,
+      "detail": "other period found"
+    },
+    {
+      "name": "UDISE+ 2025-26: udise_schools_total states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=1466682 india=1466682"
+    },
+    {
+      "name": "UDISE+ 2025-26: udise_enrolment_total states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=247219766 india=247219766"
+    },
+    {
+      "name": "UDISE+ 2025-26: udise_teachers_total states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=10273020 india=10273020"
+    },
+    {
+      "name": "UDISE+ 2025-26: udise_single_teacher_schools states sum to India (|diff| <= 0.1%)",
+      "ok": true,
+      "detail": "sum=100843 india=100843"
+    },
+    {
+      "name": "UDISE+ 2025-26: published PTR equals enrolment/teachers (within rounding)",
+      "ok": true,
+      "detail": "0 rows off by >1"
+    },
+    {
+      "name": "UDISE+ 2025-26: published averages equal totals ratios (within rounding)",
+      "ok": true,
+      "detail": "0 rows off by >1"
+    },
+    {
+      "name": "UDISE+ 2025-26: facility counts never exceed total schools",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "UDISE+ 2025-26: derived shares within 0-100",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "UDISE+ 2025-26: national totals equal the booklet's printed headline table (p.11)",
+      "ok": true,
+      "detail": "printed 14,66,682/24,72,19,766/1,02,73,020/24"
+    },
+    {
+      "name": "UDISE+ 2025-26: national facility shares match the percentages printed on p.29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ASER: all percentages within 0-100",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "ASER: confidence-interval half-widths plausible (0-35 points)",
+      "ok": true,
+      "detail": "0 rows"
+    },
+    {
+      "name": "ASER state page rajasthan: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER rajasthan: divisional-2024 state values equal district-table state values",
+      "ok": true,
+      "detail": "0 mismatches"
+    },
+    {
+      "name": "ASER rajasthan: parsed 33 districts, source says 33 of 33",
+      "ok": true,
+      "detail": "parsed 33 < 33"
+    },
+    {
+      "name": "ASER state page gujarat: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER gujarat: divisional-2024 state values equal district-table state values",
+      "ok": true,
+      "detail": "0 mismatches"
+    },
+    {
+      "name": "ASER gujarat: parsed 26 districts, source says 26 of 26",
+      "ok": true,
+      "detail": "parsed 26 < 26"
+    },
+    {
+      "name": "ASER state page haryana: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER haryana: divisional-2024 state values equal district-table state values",
+      "ok": true,
+      "detail": "0 mismatches"
+    },
+    {
+      "name": "ASER haryana: parsed 21 districts, source says 21 of 21",
+      "ok": true,
+      "detail": "parsed 21 < 21"
+    },
+    {
+      "name": "ASER state page uttar_pradesh: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER uttar_pradesh: divisional-2024 state values equal district-table state values",
+      "ok": true,
+      "detail": "0 mismatches"
+    },
+    {
+      "name": "ASER uttar_pradesh: parsed 70 districts, source says 70 of 71",
+      "ok": true,
+      "detail": "parsed 70 < 70"
+    },
+    {
+      "name": "ASER state page madhya_pradesh: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER madhya_pradesh: parsed 50 districts, source says 50 of 50",
+      "ok": true,
+      "detail": "parsed 50 < 50"
+    },
+    {
+      "name": "ASER state page bihar: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER bihar: divisional-2024 state values equal district-table state values",
+      "ok": true,
+      "detail": "0 mismatches"
+    },
+    {
+      "name": "ASER bihar: parsed 38 districts, source says 38 of 38",
+      "ok": true,
+      "detail": "parsed 38 < 38"
+    },
+    {
+      "name": "ASER state page punjab: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER state page uttarakhand: 10 indicators parsed",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "name": "ASER uttarakhand: divisional-2024 state values equal district-table state values",
+      "ok": true,
+      "detail": "0 mismatches"
+    },
+    {
+      "name": "ASER uttarakhand: parsed 12 districts, source says 12 of 13",
+      "ok": true,
+      "detail": "parsed 12 < 12"
+    }
+  ],
+  "failures": [],
+  "warnings": [
+    "ASER madhya_pradesh: divisional file has no state-total row; cross-check skipped",
+    "ASER punjab: no district-estimates file exists/parsed for this state; district-vs-divisional cross-check skipped"
+  ],
+  "per_source": {
+    "aser_2024_bihar_district": {
+      "rows": 234,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_bihar_divisional": {
+      "rows": 180,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_bihar_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_gujarat_district": {
+      "rows": 162,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_gujarat_divisional": {
+      "rows": 90,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_gujarat_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_haryana_district": {
+      "rows": 132,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_haryana_divisional": {
+      "rows": 126,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_haryana_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_madhya_pradesh_district": {
+      "rows": 306,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_madhya_pradesh_divisional": {
+      "rows": 180,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_madhya_pradesh_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_punjab_divisional": {
+      "rows": 108,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_punjab_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_rajasthan_district": {
+      "rows": 204,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_rajasthan_divisional": {
+      "rows": 144,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_rajasthan_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_uttar_pradesh_district": {
+      "rows": 426,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_uttar_pradesh_divisional": {
+      "rows": 342,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_uttar_pradesh_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_uttarakhand_district": {
+      "rows": 78,
+      "suppressed": 12,
+      "completeness_pct": 84.6
+    },
+    "aser_2024_uttarakhand_divisional": {
+      "rows": 54,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "aser_2024_uttarakhand_state": {
+      "rows": 10,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "udise_2024_25_booklet": {
+      "rows": 999,
+      "suppressed": 0,
+      "completeness_pct": 100
+    },
+    "udise_2025_26_booklet": {
+      "rows": 999,
+      "suppressed": 0,
+      "completeness_pct": 100
+    }
+  },
+  "coverage": {
+    "udise_states_uts": 36,
+    "aser_states_with_state_page": 8,
+    "aser_districts_parsed": 250,
+    "aser_divisions_parsed": 61
+  }
+}

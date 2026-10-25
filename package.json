@@ -6,21 +6,47 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "db:seed": "tsx scripts/db.ts seed",
+    "db:reset": "tsx scripts/db.ts reset",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "test:e2e": "node scripts/clean-e2e.mjs && next build && playwright test",
+    "data:download": "tsx scripts/data/download.ts",
+    "data:normalize": "tsx scripts/data/normalize.ts",
+    "data:validate": "tsx scripts/data/validate.ts",
+    "data:registry": "tsx scripts/data/build-registry.ts",
+    "data:registry-doc": "tsx scripts/data/registry-doc.ts",
+    "data:dictionary": "tsx scripts/data/dictionary.ts",
+    "data:refresh": "npm run data:download && npm run data:normalize && npm run data:validate && npm run kb:extract && npm run data:registry && npm run data:ingest && npm run kb:ingest",
+    "data:ingest": "tsx scripts/data/ingest.ts",
+    "kb:extract": "tsx scripts/data/extract-kb.ts",
+    "kb:ingest": "tsx scripts/data/kb-ingest.ts"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.61.0",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "pdfjs-dist": "^6.4.299",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
   }
 }

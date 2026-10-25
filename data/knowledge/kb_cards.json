@@ -1,0 +1,185 @@
+{
+  "_comment": "Source-backed practice-card DRAFTS. Every step is a close paraphrase of an excerpt in kb_chunks.json and cites its printed page. Cards are imported as 'draft' and can only be approved by a human curator after each linked excerpt has been approved. next_step wording is SAMVAAD-drafted from the cited passages and must be checked by the curator. There is no Hindi text yet: Hindi coaching text for these cards would be machine-translated and needs expert review.",
+  "source_ref": {
+    "source_org": "Ministry of Education, Department of School Education & Literacy",
+    "source_title": "NIPUN Bharat: Guidelines for Implementation (English, DIKSHA copy)",
+    "source_url": "https://diksha.gov.in/assets/docs/NIPUN-BHARAT-GUIDELINES-EN.pdf",
+    "source_type": "official_document"
+  },
+  "cards": [
+    {
+      "id": "K-R01",
+      "title": "Read aloud, then talk about the story",
+      "domain": "Reading comprehension",
+      "grade_min": 1, "grade_max": 3, "subject": "Language", "teaching_language": "any",
+      "description": "The NIPUN Bharat guidelines describe read-aloud as a teacher picking up an engaging story and reading it out with variation in pitch, tone, pace, volume, pauses, eye contact, questions and comments, which engages children's creativity and imagination and increases attention span. They add that children should have opportunities to talk about a story and that asking questions is an important strategy for language and early literacy.",
+      "steps": [
+        "Choose an engaging story and read it aloud, varying pitch, tone, pace, volume and pauses, and using eye contact, questions and comments (printed p.4).",
+        "After the reading, start a discussion about the messages, perceptions and impressions children gathered from the story (printed p.74).",
+        "Let children talk about the story in any way they like: to extend it, substitute its characters, or make up their own stories (printed p.74).",
+        "Ask questions about the story, and encourage children to frame and ask questions of their own (printed pp.118, 144)."
+      ],
+      "example_prompts": [],
+      "next_step": "After each read-aloud this week, hold a short conversation about the story and let children ask their own questions about it.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": ["A story book"],
+      "tags": ["RC-01", "read-aloud", "read", "aloud", "story", "conversation", "discussion", "questions", "meaning", "comprehension", "understand", "understood"],
+      "chunks": [["NBG-p6-readaloud", "primary"], ["NBG-p76-stories", "supporting"], ["NBG-p120-readaloud-questions", "supporting"], ["NBG-p146-learner-questions", "supporting"]]
+    },
+    {
+      "id": "K-R02",
+      "title": "Retell and re-create stories",
+      "domain": "Reading comprehension",
+      "grade_min": 1, "grade_max": 3, "subject": "Language", "teaching_language": "any",
+      "description": "The guidelines say good stories deserve many re-tellings, that children should be given opportunities to talk about a story and re-create it, and they list reading and narrating or re-telling stories as an expected Class II reading outcome.",
+      "steps": [
+        "Tell or read a story; good stories deserve many re-tellings (printed p.74).",
+        "Create opportunities for children to talk about a story in any way they like, to extend it, substitute its characters and make up their own stories (printed p.74).",
+        "Work towards children who can read and narrate or re-tell stories from children's literature or the textbook, a Class II outcome (printed p.198)."
+      ],
+      "example_prompts": [],
+      "next_step": "This week, give children a chance to re-tell a story they have heard in their own words, or to change its characters.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": ["A story book"],
+      "tags": ["RC-02", "retell", "retelling", "narrate", "story", "re-create", "characters", "sequence"],
+      "chunks": [["NBG-p76-stories", "primary"], ["NBG-p200-outcome-class2", "supporting"], ["NBG-p200-outcome-class1", "supporting"]]
+    },
+    {
+      "id": "K-R03",
+      "title": "From read-aloud to shared and independent reading",
+      "domain": "Early reading fluency",
+      "grade_min": 1, "grade_max": 3, "subject": "Language", "teaching_language": "any",
+      "description": "The guidelines recommend a gradual release of responsibility: modelling through read-aloud, then shared reading (the whole class reads from one big book), then guided reading, graduating to independent reading, supported by a range of children's literature.",
+      "steps": [
+        "Model reading by reading aloud to the class (printed p.67).",
+        "Move to shared reading: hold up one big book so the whole class can read along; children join in when they recognise a word from illustrations, sight words or memory (printed p.4).",
+        "Continue with guided reading, graduating to independent reading (printed p.67).",
+        "Expose children to a range of children's literature for read-aloud, shared and independent reading (printed p.76)."
+      ],
+      "example_prompts": [],
+      "next_step": "In one lesson this week, use a big book for shared reading and invite children to join in on the words they recognise.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": ["A big book or large-print story chart"],
+      "tags": ["DC-02", "shared", "reading", "guided", "independent", "gradual", "big book", "aloud", "read", "pair", "fluency"],
+      "chunks": [["NBG-p69-gradual-release", "primary"], ["NBG-p6-sharedreading", "supporting"], ["NBG-p78-literature", "supporting"]]
+    },
+    {
+      "id": "K-R04",
+      "title": "Keep meaning at the centre of reading",
+      "domain": "Reading comprehension",
+      "grade_min": 1, "grade_max": 3, "subject": "Language", "teaching_language": "any",
+      "description": "The guidelines say oral language and literacy activities should be planned together so that children learn not only to read but also to make meaning of reading and read with comprehension, and that early literacy should lead to critical thinking and reasoning.",
+      "steps": [
+        "Plan oral-language and literacy activities together rather than one after the other (printed p.67).",
+        "Aim for children who read with comprehension, not only children who can read the words (printed p.67).",
+        "Treat critical thinking and reasoning as an aim of early literacy teaching (printed p.67)."
+      ],
+      "example_prompts": [],
+      "next_step": "Alongside each reading activity this week, add a short oral-language activity that asks children what the text means.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": [],
+      "tags": ["RC-01", "comprehension", "meaning", "understood", "understand", "oral", "language", "thinking", "reading"],
+      "chunks": [["NBG-p69-comprehension", "primary"], ["NBG-p69-critical-thinking", "supporting"]]
+    },
+    {
+      "id": "K-N01",
+      "title": "Count and group real objects",
+      "domain": "Foundational numeracy",
+      "grade_min": 1, "grade_max": 3, "subject": "Mathematics", "teaching_language": "any",
+      "description": "The guidelines recommend teaching numbers and groups of tens with a variety of real objects such as sticks and pencils, matching and sorting objects, counting accurately by pointing to, touching or moving each object, and estimating how many before checking.",
+      "steps": [
+        "Teach numbers and the concept of groups of tens using objects such as sticks or pencils (printed p.87).",
+        "Involve children in matching and sorting objects using one-to-one correspondence (printed p.87).",
+        "Have children count different groups of objects and think about quantity; use strategies such as pointing to, touching or moving each object counted (printed p.87).",
+        "Ask children to estimate how many objects are in a group, then test the actual answer (printed p.87)."
+      ],
+      "example_prompts": [],
+      "next_step": "In the next maths lesson, let children count and group real objects such as sticks into tens before they write the numbers.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": ["Sticks, pencils or similar counting objects"],
+      "tags": ["NM-01", "NM-03", "counting", "count", "objects", "concrete", "sticks", "tens", "group", "place", "value", "estimate", "numbers"],
+      "chunks": [["NBG-p89-counting-objects", "primary"], ["NBG-p89-estimation", "supporting"], ["NBG-p97-experiential", "supporting"]]
+    },
+    {
+      "id": "K-N02",
+      "title": "Explore different strategies and let children explain",
+      "domain": "Foundational numeracy",
+      "grade_min": 1, "grade_max": 3, "subject": "Mathematics", "teaching_language": "any",
+      "description": "The guidelines say different ways of calculating and different problem-solving strategies should be explored, not only standard algorithms, and that children should be given stress-free opportunities to communicate their mathematical ideas without fear of being wrong.",
+      "steps": [
+        "Explore different ways of calculating and different problem-solving strategies, not only the standard algorithm (printed p.96).",
+        "Give all children opportunities to communicate their ideas in a stress-free, friendly environment (printed p.95).",
+        "Let children use mathematical language without fear of being wrong; they improve with time and concerted opportunities (printed p.95)."
+      ],
+      "example_prompts": [],
+      "next_step": "On two problems this week, ask children to tell or show how they solved it, and invite a different way.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": [],
+      "tags": ["NM-02", "explain", "strategies", "methods", "how", "thinking", "answer", "problem", "communicate"],
+      "chunks": [["NBG-p98-explore-strategies", "primary"], ["NBG-p97-communicate-no-fear", "supporting"]]
+    },
+    {
+      "id": "K-N03",
+      "title": "Use manipulatives and toys for hands-on mathematics",
+      "domain": "Foundational numeracy",
+      "grade_min": 1, "grade_max": 3, "subject": "Mathematics", "teaching_language": "any",
+      "description": "The guidelines call hands-on experience an integral part of mathematics in the lower classes, giving children an implicit understanding of concepts and helping them visualise them, and encourage use of locally available toys and manipulatives.",
+      "steps": [
+        "Provide hands-on experience with manipulatives or toys when introducing a mathematical idea (printed p.96).",
+        "Use indigenous toys and objects from children's surroundings as teaching resources (printed p.96).",
+        "Focus activities and interaction on experiential learning with manipulative and concrete material (printed p.95)."
+      ],
+      "example_prompts": [],
+      "next_step": "In the next maths lesson, introduce the idea with a manipulative or locally available toy before using the board.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": ["Locally available toys or manipulatives"],
+      "tags": ["NM-01", "manipulative", "manipulatives", "toys", "hands-on", "concrete", "material", "objects", "visualise", "board", "digits"],
+      "chunks": [["NBG-p98-manipulatives", "primary"], ["NBG-p97-experiential", "supporting"]]
+    },
+    {
+      "id": "K-I01",
+      "title": "Interact with individual children to extend their thinking",
+      "domain": "Classroom interaction",
+      "grade_min": 1, "grade_max": 3, "subject": "Any", "teaching_language": "any",
+      "description": "The guidelines describe a good teacher as friendly and interactive with all learners, asking individual children questions about their work to help them extend their thinking and encourage conversation, without being intrusive or directive.",
+      "steps": [
+        "Be friendly and interactive with all learners (printed p.118).",
+        "Ask children individual questions about what they made or did, to help them extend their thinking and encourage conversation (printed p.118).",
+        "Avoid being intrusive or directive; allow learners' initiative and imagination to flourish (printed p.118)."
+      ],
+      "example_prompts": [],
+      "next_step": "This week, during an activity, walk around and ask individual children one question about what they are doing.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": [],
+      "tags": ["CI-02", "questions", "interact", "interaction", "conversation", "individual", "extend", "thinking", "one-word", "recall"],
+      "chunks": [["NBG-p120-interaction", "primary"]]
+    },
+    {
+      "id": "K-I02",
+      "title": "Build participation through questions and problems",
+      "domain": "Classroom interaction",
+      "grade_min": 1, "grade_max": 3, "subject": "Any", "teaching_language": "any",
+      "description": "The guidelines say activities should be made more participatory, that children should be encouraged to take part by asking questions and framing problems, and that they should have the opportunity to respond, discuss and share readings and books.",
+      "steps": [
+        "Make activities and learning tasks more participatory, keeping in view children's varied needs (printed p.144).",
+        "Encourage children to participate by asking questions and framing problems (printed p.144).",
+        "Give children opportunities to respond, discuss and share readings and books (printed p.144)."
+      ],
+      "example_prompts": [],
+      "next_step": "In one lesson this week, invite children to ask their own questions or make up a problem for a partner to answer.",
+      "variation": null,
+      "example_dialogue": [],
+      "tlm": [],
+      "tags": ["CI-03", "CI-01", "participation", "participate", "discuss", "share", "questions", "problems", "peer", "volunteer", "same"],
+      "chunks": [["NBG-p146-participation", "primary"]]
+    }
+  ]
+}
