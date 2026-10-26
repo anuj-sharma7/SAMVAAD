@@ -134,11 +134,26 @@ tests/  e2e/  docs/
 
 ## Documentation
 
-[V5 status and gates](docs/V5_RELEASE_STATUS.md) · [Baseline](docs/BASELINE_STATUS.md) · [Data dictionary](docs/DATA_DICTIONARY.md) · [Architecture](docs/architecture.md) · [Data model](docs/data-model.md) · [API contract](docs/api-contract.md) · [Data directory](data/README.md) · [Data access requests](docs/data_access_requests.md) · [Privacy and safety](docs/privacy-and-safety.md) · [Limitations and assumptions](docs/limitations-and-assumptions.md) · [Known limitations](docs/KNOWN_LIMITATIONS.md) · [QA test report](docs/QA_TEST_REPORT.md) · [Security review](docs/SECURITY_REVIEW.md) · [Threat model](docs/SECURITY_THREAT_MODEL.md) · [Data source registry](docs/DATA_SOURCE_REGISTRY.md) · [Release checklist](docs/RELEASE_CHECKLIST.md) · [Three-minute judge demo](docs/demo-script.md)
+[V5 status and gates](docs/V5_RELEASE_STATUS.md) · [Mobile/offline baseline](docs/MOBILE_OFFLINE_BASELINE.md) · [Mobile threat model](docs/MOBILE_THREAT_MODEL.md) · [Mobile security review](docs/MOBILE_SECURITY_REVIEW.md) · [Mobile test plan](docs/MOBILE_TEST_PLAN.md) · [Baseline](docs/BASELINE_STATUS.md) · [Data dictionary](docs/DATA_DICTIONARY.md) · [Architecture](docs/architecture.md) · [Data model](docs/data-model.md) · [API contract](docs/api-contract.md) · [Data directory](data/README.md) · [Data access requests](docs/data_access_requests.md) · [Privacy and safety](docs/privacy-and-safety.md) · [Limitations and assumptions](docs/limitations-and-assumptions.md) · [Known limitations](docs/KNOWN_LIMITATIONS.md) · [QA test report](docs/QA_TEST_REPORT.md) · [Security review](docs/SECURITY_REVIEW.md) · [Threat model](docs/SECURITY_THREAT_MODEL.md) · [Data source registry](docs/DATA_SOURCE_REGISTRY.md) · [Release checklist](docs/RELEASE_CHECKLIST.md) · [Three-minute judge demo](docs/demo-script.md)
+
+## Field mode: works without internet (PWA)
+
+Open **http://localhost:3000/field** (or the "Field mode" item in the menu) while signed in as a mentor. The first visit while online caches the app shell and loads your schools, visits and approved practice cards. After that you can record visits, observations and one agreed next step with no connection; they are saved on the device, shown as "Saved on this device — pending sync", and sent when you are online again ("Synced to server" appears only after the server confirms). Everything is explained in the in-app Sync Center (#/sync).
+
+```powershell
+# install and try the PWA locally (service workers need localhost or https)
+cd C:devsamvaad
+npm run build; npm run start          # http://localhost:3000, not "npm run dev" (the service worker is for production builds)
+# In Chrome: open /field, wait a few seconds, then DevTools > Network > Offline (or airplane mode), reload, record a visit,
+# close the browser, reopen /field offline (records are still there), go online and press "Sync now".
+# Install: Chrome address bar "Install" icon (or menu > Install app); iPhone Safari: Share > Add to Home Screen.
+```
+
+Important limits: records are stored in the browser **without encryption** and can be lost if browser data is cleared or the phone is lost before syncing; AI features need internet; Android packaging is evaluated but **not built**. See [offline storage and recovery](docs/OFFLINE_STORAGE_AND_RECOVERY.md), [sync protocol](docs/OFFLINE_SYNC_PROTOCOL.md), [mobile architecture decision](docs/MOBILE_ARCHITECTURE_DECISION.md), [mobile QA report](docs/MOBILE_QA_REPORT.md) and [mobile known limitations](docs/MOBILE_KNOWN_LIMITATIONS.md). Diagnose a stuck item in the Sync Center: its row explains why in plain words and offers "Try again" or, for refused changes, removal after confirmation.
 
 ## Release status
 
-**Demo / prototype only. NO-GO for production or real user data**: sign-in is a demo persona picker (no real authentication). Automated checks pass (207 unit/integration tests, 12 browser tests, 41 data checks, 0 npm vulnerabilities), but no independent security tooling, penetration test or live AI call has been run. See [Release checklist](docs/RELEASE_CHECKLIST.md), [Security review](docs/SECURITY_REVIEW.md) and [Known limitations](docs/KNOWN_LIMITATIONS.md).
+**Demo / prototype only. NO-GO for production or real user data**: sign-in is a demo persona picker (no real authentication). Automated checks pass (316 unit/integration tests, 27 browser tests including real offline/restart/sync runs, 53 data checks, 0 npm vulnerabilities), but no independent security tooling, penetration test, live AI call, Android build or real-device test has been run. Offline records are stored unencrypted in the browser. See [Release checklist](docs/RELEASE_CHECKLIST.md), [Security review](docs/SECURITY_REVIEW.md) and [Known limitations](docs/KNOWN_LIMITATIONS.md).
 
 ## Safeguards (enforced in code and covered by tests)
 

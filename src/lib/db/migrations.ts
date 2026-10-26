@@ -490,4 +490,23 @@ CREATE INDEX idx_sessions_expiry ON sessions(expires_at);
 ALTER TABLE profiles ADD COLUMN ui_language TEXT CHECK (ui_language IN ('en','hi'));
 `,
   },
+  {
+    id: "0006_sync_operations",
+    sql: `
+-- Offline sync: every operation a device sends carries a client-generated operation id. Terminal outcomes are stored here so
+-- a retry (for example after a timeout where the first request had already committed) returns the first result instead of
+-- applying the change twice. The stored response holds ids, statuses and error codes only, never observation text.
+CREATE TABLE sync_operations (
+  op_id       TEXT PRIMARY KEY,
+  actor_id    TEXT NOT NULL REFERENCES profiles(id),
+  entity_type TEXT NOT NULL,
+  entity_id   TEXT NOT NULL,
+  op          TEXT NOT NULL,
+  status      TEXT NOT NULL CHECK (status IN ('applied','rejected')),
+  response    TEXT NOT NULL,
+  created_at  TEXT NOT NULL
+);
+CREATE INDEX idx_sync_ops_actor ON sync_operations(actor_id, created_at);
+`,
+  },
 ];

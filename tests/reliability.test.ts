@@ -141,7 +141,7 @@ describe("persistence and migrations on a disposable file database", () => {
     db1.close();
 
     const db2 = openDatabase(file); // reopening re-runs the migration runner: nothing must be re-applied
-    expect(all(db2, "SELECT id FROM schema_migrations").length).toBe(5);
+    expect(all(db2, "SELECT id FROM schema_migrations").length).toBe(6);
     expect(get<{ n: number }>(db2, "SELECT count(*) AS n FROM visits")!.n).toBe(counts1.visits);
     const reopened = getVisitDetail(db2, asha(db2), v.id);
     expect(reopened.visit.teacher_alias).toBe("T-901");

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { all, get, run, transaction, type Db } from "../db/client";
-import { newId, nowIso, parseJson } from "../util";
+import { isUuid, newId, nowIso, parseJson } from "../util";
 import { conflict, invalid, notFound } from "../errors";
 import { audit } from "./audit";
 import { assertNotStale, getAuthorizedVisit } from "./access";
@@ -100,11 +100,12 @@ function suggestAndStore(db: Db, actor: Actor, obs: ObservationRow) {
   }
 }
 
-export function addObservation(db: Db, actor: Actor, visitId: string, input: unknown): ObservationView {
+export function addObservation(db: Db, actor: Actor, visitId: string, input: unknown, opts: { id?: string } = {}): ObservationView {
+  if (opts.id !== undefined && !isUuid(opts.id)) throw invalid("Record id must be a UUID");
   const visit = getAuthorizedVisit(db, actor, visitId, "write");
   assertObservable(db, visit);
   const d = observationSchema.parse(input);
-  const id = newId();
+  const id = opts.id ?? newId();
   const ts = nowIso();
   transaction(db, () => {
     run(

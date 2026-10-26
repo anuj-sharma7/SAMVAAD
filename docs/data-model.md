@@ -56,3 +56,13 @@ Why `commitments.review_visit_id` exists: a later visit records what happened to
 | `kb_chunks` | Verbatim excerpt (20-900 chars), PDF and printed page, `review_status` (CHECK: reviewed states need a reviewer and time). |
 | `practice_card_chunks` | Card to excerpt links (primary / supporting). `practice_cards.origin` is `illustrative` or `official_source`. |
 | `feedback_citation_chunks` | Snapshot of the exact excerpt(s) shown with each citation, so approved feedback stays traceable. |
+
+## Added for sync and language (V5, V6)
+
+| Table / column | Purpose |
+|---|---|
+| `profiles.ui_language` (`0005_ui_language`) | Interface language, separate from `preferred_language` (coaching drafts). NULL until chosen. |
+| `sync_operations` (`0006_sync_operations`) | One row per terminal offline operation: `op_id` (PK), `actor_id`, entity, `status` (`applied` or `rejected`), `response` (ids and codes only). Makes retries idempotent. |
+| commitments created through sync | `feedback_id` may be NULL (mentor-agreed offline); the audit entry carries `mentor_agreed_without_feedback`. One non-cancelled commitment per visit is enforced in the service. |
+
+Records created offline use client-generated UUIDs as their primary keys, so retries cannot create duplicates.

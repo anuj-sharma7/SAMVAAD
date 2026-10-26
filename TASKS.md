@@ -101,3 +101,25 @@ Baseline: `docs/BASELINE_STATUS.md`. Results and gates: `docs/V5_RELEASE_STATUS.
 | `npx playwright test` | 20 / 20 |
 
 Gate A PASS, Gate B PASS, Gate C NOT MET, Gate D NOT MET. Hindi text is unreviewed.
+
+## V6 pass: mobile, offline-first, secure sync (2026-10-26)
+
+Baseline: `docs/MOBILE_OFFLINE_BASELINE.md`. Decision: `docs/MOBILE_ARCHITECTURE_DECISION.md` (PWA now; Capacitor and native encrypted storage evaluated, not built). Results: `docs/MOBILE_QA_REPORT.md`.
+
+- [x] Server sync API (`/sync/push`, `/sync/snapshot`), idempotent via `sync_operations` (migration 0006), client-generated UUIDs
+- [x] On-device store (IndexedDB per account), transactional outbox, migrations, conflicts, wipe guard
+- [x] Sync engine: backoff with jitter, partial sync, expired session, account binding, conflict capture
+- [x] Field mode UI (English/Hindi): visits, observations, next step, local draft report, practice cards, Sync Center, status bar
+- [x] PWA: manifest, icons, service worker (public shell + static assets only), offline page, sign-out warning
+- [x] Bug found by tests: Hindi teacher aliases with vowel signs were rejected by the server (fixed)
+
+| Check | Result |
+|---|---|
+| tsc / eslint | pass / pass |
+| `npx vitest run` | 316 / 316 (24 files) |
+| `npm run data:validate` | 53 / 53 |
+| `npx playwright test` | 27 / 27 (incl. 7 offline tests with browser restart) |
+| `npm audit` | 0 vulnerabilities |
+| Android debug build, real-device tests | not built / not tested |
+
+Not done: encryption at rest, app lock, backup/export, Capacitor/Android, background sync. Field-pilot gate NOT met.

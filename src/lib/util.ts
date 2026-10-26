@@ -27,3 +27,7 @@ export function addDays(date: Date | string, days: number): Date {
 export function isoDate(date: Date | string): string {
   return new Date(date).toISOString().slice(0, 10);
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+/** Offline clients generate their own record ids (UUIDs); anything else is refused. */
+export const isUuid = (v: unknown): v is string => typeof v === "string" && UUID_RE.test(v);

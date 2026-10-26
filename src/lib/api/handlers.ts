@@ -19,6 +19,7 @@ import { createCard, getCard, getChunk, listCards, reviewCard, reviewChunk, revi
 import { getPriorityRules, setPriorityRules, updatePreferences } from "../services/settings";
 import { LOCALES, LOCALE_COOKIE } from "../i18n/config";
 import { getActionSummary, getPreVisitBrief } from "../services/brief";
+import { buildSnapshot, pushOperations } from "../services/sync";
 import { withIdempotency } from "../services/idempotency";
 import { freshness, getIndicatorDef, getSource, listIndicatorDefs, listSources, periodsFor, sourceQuality, stateSnapshot, statesWithData, valuesFor } from "../services/public-context";
 import type { VisitStatus } from "../types";
@@ -132,6 +133,10 @@ route("PATCH", "/demonstrations/:id", async (c) => editDemonstration(c.db, c.act
 route("POST", "/demonstrations/:id/approve", (c) => approveDemonstration(c.db, c.actor, c.params.id));
 
 // ---- follow-up (E5) ----------------------------------------------------------------------------
+// ---- offline sync (see docs/OFFLINE_SYNC_PROTOCOL.md) ------------------------------------------------
+route("POST", "/sync/push", async (c) => pushOperations(c.db, c.actor, await c.json()));
+route("GET", "/sync/snapshot", (c) => buildSnapshot(c.db, c.actor));
+
 route("GET", "/visits/:id/brief", (c) => getPreVisitBrief(c.db, c.actor, c.params.id));
 route("GET", "/visits/:id/action-summary", (c) => getActionSummary(c.db, c.actor, c.params.id));
 route("GET", "/visits/:id/commitment-suggestion", (c) => suggestCommitment(c.db, c.actor, c.params.id));

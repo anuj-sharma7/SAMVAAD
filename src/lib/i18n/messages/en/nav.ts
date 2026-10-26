@@ -16,5 +16,10 @@ const m = {
   "nav.drawer": "Navigation",
   "nav.tagline": "संवाद · mentoring copilot",
   "nav.signOut": "Switch persona / sign out",
+  "nav.fieldMode": "Field mode (works offline)",
+  "nav.signOut.pendingTitle": "Records on this device are not sent yet",
+  "nav.signOut.pendingBody": "{n} saved on this device have not reached the server. Signing out does not delete them: they stay on this device and are sent when you sign in again as {name}.",
+  "nav.signOut.openSync": "Open Sync Center",
+  "nav.signOut.anyway": "Sign out anyway",
 };
 export default m;

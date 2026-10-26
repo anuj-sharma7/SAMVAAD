@@ -37,6 +37,7 @@ export type AuditAction =
   | "school.created"
   | "school.assigned"
   | "settings.priority_rules_updated"
+  | "sync.pushed"
   | "dataset.imported"
   | "dataset.updated"
   | "dataset.rejected"

@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: { default: "SAMVAAD", template: "%s · SAMVAAD" },
   description:
     "An AI-assisted mentoring copilot that turns every school visit into one evidence-backed, followed-up coaching cycle. Prototype with fictional demo data.",
+  // Installable as an app: manifest in src/app/manifest.ts, service worker in public/sw.js
+  icons: { icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "SAMVAAD", statusBarStyle: "default" },
 };
 export const viewport: Viewport = { themeColor: "#0f1b33", width: "device-width", initialScale: 1 };
 

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { all, get, run, transaction, type Db } from "../db/client";
-import { newId, nowIso, addDays, daysBetween, isoDate } from "../util";
+import { isUuid, newId, nowIso, addDays, daysBetween, isoDate } from "../util";
 import { conflict, invalid, notFound } from "../errors";
 import { audit } from "./audit";
-import { getAuthorizedVisit } from "./access";
+import { assertNotStale, getAuthorizedVisit } from "./access";
 import { currentFeedbackInternal } from "./feedback";
 import { requireRole } from "../auth/policy";
 import { DEFAULT_COMMITMENT_DAYS, DUE_SOON_DAYS } from "../config";
@@ -122,32 +122,42 @@ export const createCommitmentSchema = z.object({
   expected_evidence: z.string().trim().min(3, "What will the mentor look for?").max(600),
 });
 
-export function createCommitment(db: Db, actor: Actor, input: unknown): CommitmentView {
+/**
+ * `opts.id`: client-generated UUID (offline create, retry-safe). `opts.mentorAgreed`: the mentor recorded this agreement
+ * themselves on the device, so it does not need an AI-drafted, approved feedback card (it is then stored without feedback_id
+ * and the audit entry says so). Without the flag the original rule applies: approved feedback first.
+ */
+export function createCommitment(db: Db, actor: Actor, input: unknown, opts: { id?: string; mentorAgreed?: boolean } = {}): CommitmentView {
+  if (opts.id !== undefined && !isUuid(opts.id)) throw invalid("Record id must be a UUID");
   const d = createCommitmentSchema.parse(input);
   const visit = getAuthorizedVisit(db, actor, d.visit_id, "write");
   if (visit.status === "completed") throw conflict("visit_locked", "Completed visits are read-only");
   const fb = currentFeedbackInternal(db, visit.id);
-  if (!fb || fb.status !== "approved") {
+  const linkFeedback = !!fb && fb.status === "approved";
+  if (!linkFeedback && !opts.mentorAgreed) {
     throw conflict("feedback_not_approved", "Approve the feedback card before agreeing a commitment");
   }
-  if (get(db, "SELECT 1 AS x FROM commitments WHERE feedback_id = ? AND status <> 'cancelled'", fb.id)) {
+  if (get(db, "SELECT 1 AS x FROM commitments WHERE visit_id = ? AND status <> 'cancelled'", visit.id)) {
+    throw conflict("commitment_exists", "A next step has already been agreed for this visit");
+  }
+  if (linkFeedback && get(db, "SELECT 1 AS x FROM commitments WHERE feedback_id = ? AND status <> 'cancelled'", fb!.id)) {
     throw conflict("commitment_exists", "A commitment already exists for this feedback card");
   }
   const days = daysBetween(isoDate(visit.scheduled_at), d.target_date);
   if (days < 0) throw invalid("The target date cannot be before the visit date");
   if (days > 180) throw invalid("The target date should be within 180 days of the visit");
 
-  const id = newId();
+  const id = opts.id ?? newId();
   const ts = nowIso();
   transaction(db, () => {
     run(
       db,
       `INSERT INTO commitments (id, visit_id, feedback_id, action_text, owner_role, owner_alias, target_date,
          expected_evidence, status, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?, 'open', ?,?,?)`,
-      id, visit.id, fb.id, d.action_text, d.owner_role, d.owner_alias ?? visit.teacher_alias, d.target_date,
+      id, visit.id, linkFeedback ? fb!.id : null, d.action_text, d.owner_role, d.owner_alias ?? visit.teacher_alias, d.target_date,
       d.expected_evidence, actor.id, ts, ts,
     );
-    audit(db, actor, "commitment.created", "commitment", id, { visit_id: visit.id, target_date: d.target_date });
+    audit(db, actor, "commitment.created", "commitment", id, { visit_id: visit.id, target_date: d.target_date, ...(linkFeedback ? {} : { mentor_agreed_without_feedback: true }) });
   });
   return getCommitment(db, actor, id);
 }
@@ -157,12 +167,14 @@ export const updateCommitmentSchema = z.object({
   target_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   expected_evidence: z.string().trim().min(3).max(600).optional(),
   status: z.enum(["completed", "cancelled"]).optional(),
+  expected_updated_at: z.string().max(40).optional(),
 });
 
 export function updateCommitment(db: Db, actor: Actor, id: string, input: unknown): CommitmentView {
   const current = getCommitment(db, actor, id);
   getAuthorizedVisit(db, actor, current.visit_id, "write");
-  const d = updateCommitmentSchema.parse(input);
+  const { expected_updated_at, ...d } = updateCommitmentSchema.parse(input);
+  assertNotStale(current.updated_at, expected_updated_at);
   if (current.status === "reviewed" || current.status === "cancelled") {
     throw conflict("commitment_locked", `A ${current.status} commitment can no longer be changed`);
   }

@@ -4,6 +4,7 @@ import { getActor } from "@/lib/server/context";
 import { demoModeEnabled } from "@/lib/auth/session";
 import { DEMO_USERS } from "@/lib/db/seed";
 import { PersonaPicker } from "./persona-picker";
+import { safeNext } from "@/lib/safe-next";
 import { Notice } from "@/components/ui";
 import { ToastProvider } from "@/components/toast";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -16,8 +17,9 @@ export async function generateMetadata() {
 
 const STEP_KEYS = ["common.step.plan", "common.step.observe", "common.step.coach", "common.step.demonstrate", "common.step.followup"];
 
-export default async function LoginPage() {
-  if (await getActor()) redirect("/dashboard");
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string | string[] }> }) {
+  const next = safeNext((await searchParams).next);
+  if (await getActor()) redirect(next);
   const demo = demoModeEnabled();
   const { t, locale } = await getI18n();
   return (
@@ -63,7 +65,7 @@ export default async function LoginPage() {
             </Notice>
 
             {demo ? (
-              <PersonaPicker personas={DEMO_USERS.map((u) => ({ id: u.id, name: u.name, role: u.role, designation: u.designation }))} />
+              <PersonaPicker next={next} personas={DEMO_USERS.map((u) => ({ id: u.id, name: u.name, role: u.role, designation: u.designation }))} />
             ) : (
               <Notice tone="error" title={t("login.disabledTitle")} className="mt-6">
                 {t("login.disabledBody")}

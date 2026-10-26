@@ -11,7 +11,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
   return (
     <ToastProvider>
       <FirstRunTour />
-      <Sidebar name={actor.displayName} role={actor.role} />
+      <Sidebar name={actor.displayName} role={actor.role} accountId={actor.id} />
       <div className="lg:pl-60">
         <DemoBanner />
         <main id="main" tabIndex={-1} className="mx-auto max-w-[1200px] px-4 py-6 outline-none sm:px-6 sm:py-8">

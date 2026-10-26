@@ -72,3 +72,17 @@ A critical or high open issue means NO-GO for production. R1 is the one.
 ## V5 gate summary (details in `docs/V5_RELEASE_STATUS.md`)
 
 Gate A judge-demo MVP: PASS. Gate B real data: PASS. Gate C field pilot: NOT MET (real authentication, offline/sync, reviewed Hindi and content, privacy/legal review, backup/restore drill, field usability test). Gate D production: NOT MET.
+
+## V6 mobile/offline gate summary (details in `docs/MOBILE_QA_REPORT.md`, `docs/MOBILE_SECURITY_REVIEW.md`)
+
+| Gate C item (V5 §69) | Status |
+|---|---|
+| Offline capture | **Done and tested** for visits, observations and one next step (PWA field mode, real browser offline + restart test) |
+| Queued sync, retry/recovery, idempotency | **Done and tested** (unit + browser) |
+| Conflict handling | **Done and tested** (per record; both versions kept) |
+| Logout / account-switch behaviour | **Done and tested** (warning, no deletion, per-account databases) |
+| Safe local storage | **NOT met**: IndexedDB is not encrypted, no app lock, no backup; native encrypted storage recommended and not built |
+| Android packaging and device tests | **Not built / not tested** (no JDK/SDK here) |
+| Real authentication, reviewed Hindi/content, privacy/legal review, backup/restore drill, field usability test | still open |
+
+Field-pilot readiness (Gate C): **NOT MET**. Production (Gate D): NOT MET.

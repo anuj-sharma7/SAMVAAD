@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { all, get, run, transaction, type Db } from "../db/client";
-import { newId, nowIso } from "../util";
+import { isUuid, newId, nowIso } from "../util";
 import { conflict, forbidden, invalid } from "../errors";
 import { requireRole } from "../auth/policy";
 import { audit } from "./audit";
-import { getAuthorizedVisit, isActivelyAssigned } from "./access";
+import { assertNotStale, getAuthorizedVisit, isActivelyAssigned } from "./access";
 import type { Actor, VisitRow, VisitStatus, SchoolRow } from "../types";
 
 export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS"] as const;
@@ -40,7 +40,8 @@ export const createVisitSchema = z.object({
     .trim()
     .min(1, "Enter a teacher alias, e.g. T-101")
     .max(60)
-    .regex(/^[\p{L}\p{N} .\-_]+$/u, "Use a short alias; avoid personal details"),
+    // \p{M}: Devanagari vowel signs (matras) are combining marks, so Hindi aliases need it
+    .regex(/^[\p{L}\p{M}\p{N} .\-_]+$/u, "Use a short alias; avoid personal details"),
   scheduled_at: z.string().refine((v) => !Number.isNaN(Date.parse(v)), "Enter a valid date and time"),
   grade: z.coerce.number().int().min(1).max(8),
   subject: z.enum(SUBJECTS),
@@ -56,7 +57,8 @@ export type CreateVisitInput = z.infer<typeof createVisitSchema>;
 
 export const updateVisitSchema = createVisitSchema
   .omit({ school_id: true, save_as: true })
-  .partial();
+  .partial()
+  .extend({ expected_updated_at: z.string().max(40).optional() });
 
 const blankToNull = (v: string | undefined | null) => (v && v.trim() ? v.trim() : null);
 
@@ -83,7 +85,9 @@ export function findPendingCommitment(db: Db, schoolId: string, mentorId: string
   );
 }
 
-export function createVisit(db: Db, actor: Actor, input: unknown): VisitRow {
+/** `opts.id` lets an offline client create the record under its own UUID, so a retried request cannot create a second visit. */
+export function createVisit(db: Db, actor: Actor, input: unknown, opts: { id?: string } = {}): VisitRow {
+  if (opts.id !== undefined && !isUuid(opts.id)) throw invalid("Record id must be a UUID");
   requireRole(actor, "visit:create");
   const data = createVisitSchema.parse(input);
   assertSaneDate(data.scheduled_at);
@@ -106,7 +110,7 @@ export function createVisit(db: Db, actor: Actor, input: unknown): VisitRow {
     previousId = findPendingCommitment(db, data.school_id, actor.id, data.teacher_alias)?.id ?? null;
   }
 
-  const id = newId();
+  const id = opts.id ?? newId();
   const ts = nowIso();
   transaction(db, () => {
     run(
@@ -128,7 +132,8 @@ export function createVisit(db: Db, actor: Actor, input: unknown): VisitRow {
 
 export function updateVisit(db: Db, actor: Actor, visitId: string, input: unknown): VisitRow {
   const visit = getAuthorizedVisit(db, actor, visitId, "write");
-  const patch = updateVisitSchema.parse(input);
+  const { expected_updated_at, ...patch } = updateVisitSchema.parse(input);
+  assertNotStale(visit.updated_at, expected_updated_at);
   const planningOnly = ["teacher_alias", "scheduled_at", "grade", "subject", "language", "purpose", "observation_method"];
   if (visit.status !== "draft" && visit.status !== "planned") {
     const touched = Object.keys(patch).filter((k) => planningOnly.includes(k));

@@ -5,19 +5,21 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   BookOpenCheck, CalendarCheck, Globe2, CircleHelp, ClipboardList, FileText, LayoutDashboard, Library, LogOut, Menu,
-  MessageSquareText, Presentation, School, Settings, X,
+  MessageSquareText, Presentation, School, Settings, WifiOff, X,
 } from "lucide-react";
 import { cn } from "./ui";
 import { LanguageSwitcher } from "./language-switcher";
 import { api } from "@/lib/client/api";
 import { roleKey } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
+import { registry } from "@/lib/offline/registry";
 
 type Role = "mentor" | "supervisor" | "diet_admin";
 const NAV: { href: string; labelKey: string; icon: typeof School; roles: Role[] }[] = [
   { href: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard, roles: ["mentor", "supervisor", "diet_admin"] },
   { href: "/schools", labelKey: "nav.schools", icon: School, roles: ["mentor", "supervisor", "diet_admin"] },
   { href: "/visits", labelKey: "nav.visits", icon: ClipboardList, roles: ["mentor", "supervisor"] },
+  { href: "/field", labelKey: "nav.fieldMode", icon: WifiOff, roles: ["mentor"] },
   { href: "/feedback", labelKey: "nav.feedback", icon: MessageSquareText, roles: ["mentor"] },
   { href: "/demonstrate", labelKey: "nav.demonstrations", icon: Presentation, roles: ["mentor"] },
   { href: "/follow-ups", labelKey: "nav.followUps", icon: CalendarCheck, roles: ["mentor"] },
@@ -72,30 +74,48 @@ function Brand() {
   );
 }
 
-function UserBox({ name, role }: { name: string; role: Role }) {
+function UserBox({ name, role, accountId }: { name: string; role: Role; accountId: string }) {
   const { t } = useI18n();
+  const [waiting, setWaiting] = useState<number | null>(null);
+  const signOut = async () => {
+    await api("DELETE", "/session");
+    // Full navigation: guarantees no signed-in page or client cache is left behind. Records saved on this device are NOT touched.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = "/login";
+  };
   return (
     <div className="border-t border-white/10 p-4">
       <div className="mb-3"><LanguageSwitcher tone="dark" /></div>
       <p className="truncate text-sm font-medium text-white">{name}</p>
       <p className="text-xs text-ink-100/75">{t(roleKey(role))}</p>
-      <button
-        type="button"
-        onClick={async () => {
-          await api("DELETE", "/session");
-          // Full navigation: guarantees no signed-in page or client cache is left behind.
-          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-          window.location.href = "/login";
-        }}
-        className="mt-3 inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] text-ink-100/85 hover:bg-white/10 hover:text-white"
-      >
-        <LogOut size={15} aria-hidden className="shrink-0" /> {t("nav.signOut")}
-      </button>
+      {waiting !== null && waiting > 0 ? (
+        <div role="alertdialog" aria-labelledby="signout-title" aria-describedby="signout-body" className="mt-3 rounded-lg bg-amber-50 p-3 text-[13px] text-amber-900">
+          <p id="signout-title" className="font-semibold">{t("nav.signOut.pendingTitle")}</p>
+          <p id="signout-body" className="mt-1">{t("nav.signOut.pendingBody", { n: waiting, name })}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <a href="/field#/sync" className="inline-flex min-h-9 items-center rounded-md bg-ink-900 px-3 font-medium text-white">{t("nav.signOut.openSync")}</a>
+            <button type="button" onClick={() => void signOut()} className="inline-flex min-h-9 items-center rounded-md border border-amber-300 px-3 font-medium">{t("nav.signOut.anyway")}</button>
+            <button type="button" onClick={() => setWaiting(null)} className="inline-flex min-h-9 items-center rounded-md px-3">{t("common.cancel")}</button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={async () => {
+            // Unsynced field records must never be left behind by surprise: ask first when this account has some waiting.
+            const n = await registry.getPending(accountId);
+            if (n > 0) setWaiting(n); else await signOut();
+          }}
+          className="mt-3 inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] text-ink-100/85 hover:bg-white/10 hover:text-white"
+        >
+          <LogOut size={15} aria-hidden className="shrink-0" /> {t("nav.signOut")}
+        </button>
+      )}
     </div>
   );
 }
 
-export function Sidebar({ name, role }: { name: string; role: Role }) {
+export function Sidebar({ name, role, accountId }: { name: string; role: Role; accountId: string }) {
   const { t } = useI18n();
   const [openPath, setOpenPath] = useState<string | null>(null);
   const path = usePathname();
@@ -117,7 +137,7 @@ export function Sidebar({ name, role }: { name: string; role: Role }) {
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-60 flex-col bg-ink-900 lg:flex">
         <Brand />
         <NavList role={role} />
-        <UserBox name={name} role={role} />
+        <UserBox name={name} role={role} accountId={accountId} />
       </aside>
 
       <div className="no-print sticky top-0 z-30 flex items-center justify-between bg-ink-900 px-4 py-2.5 text-white lg:hidden">
@@ -149,7 +169,7 @@ export function Sidebar({ name, role }: { name: string; role: Role }) {
             </button>
             <Brand />
             <NavList role={role} onNavigate={() => setOpen(false)} />
-            <UserBox name={name} role={role} />
+            <UserBox name={name} role={role} accountId={accountId} />
           </div>
         </div>
       )}

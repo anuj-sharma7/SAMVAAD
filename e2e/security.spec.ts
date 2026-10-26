@@ -22,7 +22,7 @@ async function api(request: APIRequestContext, method: "get" | "post" | "patch",
   return { status: res.status(), json: text ? JSON.parse(text) : null, headers: res.headers() };
 }
 async function signInApi(request: APIRequestContext, id: string) {
-  expect((await api(request, "post", "/session", { profile_id: id })).status).toBe(200);
+  expect((await api(request, "post", "/session", { profile_id: id }, { "x-forwarded-for": `10.2.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}` })).status).toBe(200);
 }
 
 test("stored XSS payloads in every free-text field render as inert text on every page", async ({ page, request }) => {

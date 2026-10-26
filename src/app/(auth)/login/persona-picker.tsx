@@ -11,7 +11,7 @@ import { errorText } from "@/lib/i18n/errors";
 
 const ICON = { mentor: GraduationCap, supervisor: UserCog, diet_admin: Library } as const;
 
-export function PersonaPicker({ personas }: { personas: { id: string; name: string; role: string; designation: string }[] }) {
+export function PersonaPicker({ personas, next = "/dashboard" }: { next?: string; personas: { id: string; name: string; role: string; designation: string }[] }) {
   const router = useRouter();
   const toast = useToast();
   const i18n = useI18n();
@@ -22,7 +22,7 @@ export function PersonaPicker({ personas }: { personas: { id: string; name: stri
     setBusy(id);
     try {
       await api("POST", "/session", { profile_id: id });
-      router.push("/dashboard");
+      router.push(next);
       router.refresh();
     } catch (e) {
       toast.error(e instanceof ApiError ? errorText(e, i18n) : t("login.signInFailed"));

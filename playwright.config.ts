@@ -20,6 +20,6 @@ export default defineConfig({
     url: `http://localhost:${PORT}/api/v1/health`,
     reuseExistingServer: false,
     timeout: 60_000,
-    env: { SAMVAAD_DB_PATH: DB, DEMO_MODE: "true", AI_PROVIDER: "demo" },
+    env: { SAMVAAD_DB_PATH: DB, DEMO_MODE: "true", AI_PROVIDER: "demo", SAMVAAD_TRUST_PROXY: "true" },
   },
 });

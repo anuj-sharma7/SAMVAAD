@@ -50,3 +50,15 @@ Provider failure → `502 { "error": { "code": "ai_insufficient_credits", "messa
 Approve with no source → `409 citation_required`. Cite an unapproved card → `422 validation_failed`.
 
 `POST /commitments/:id/review` body `{ "review_visit_id", "outcome": "tried_needs_support", "evidence", "barriers", "notes" }`. Evidence is required unless `not_tried`; barriers are required unless `tried_working`.
+
+## Offline sync (V6)
+
+Full protocol: `docs/OFFLINE_SYNC_PROTOCOL.md`. Mentors only; session cookie required.
+
+`POST /sync/push` body `{ "account_id": "<signed-in account>", "ops": [ { "op_id": "uuid", "entity_type": "visit|observation|commitment", "entity_id": "uuid", "op": "create|update|delete|transition", "payload": {…}, "expected_updated_at": "optional", "created_at": "ISO", "schema_version": 1 } ] }` (1 to 25 operations) → 200 `{ "data": { "results": [ { "op_id", "status": "applied|duplicate|conflict|rejected|skipped|error", "server_version?", "server_record?", "code?", "message?" } ], "server_time" } }`. `account_id` different from the session → 403. A repeated `op_id` returns the stored result (`duplicate`).
+
+`GET /sync/snapshot` → the mentor's assigned schools, recent visits with observations and commitments, and approved practice cards, plus `server_time` and the account.
+
+`PUT /locale` (no session needed) body `{ "locale": "en|hi" }` sets the interface-language cookie (and remembers it on the profile when signed in).
+
+`GET /visits/:id/brief` and `GET /visits/:id/action-summary` (V5) return the pre-visit brief and the teacher-facing summary.

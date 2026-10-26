@@ -58,3 +58,7 @@ Real authentication and role provisioning; legal/DPDP review and state data-shar
 - No usability sessions with real mentors, no real-device (Android) tests, no screen-reader tests, no throttled-network tests; WCAG 2.2 AA is a target, not a claim (axe reports 0 violations on the scanned pages, which is not proof of conformance).
 - UDISE+ 2025-26 was acquired from the public booklet; its NEP-format booklet was not used. The PIB release date (7 July 2026) was taken from the specification and search summaries, not read from the PIB page text.
 - Dashboard and the public-data infrastructure table show 2024-25 by default; there is no period selector yet for UDISE+.
+
+## Added in V6 (offline / mobile)
+
+See `docs/MOBILE_KNOWN_LIMITATIONS.md`. In short: field mode works offline and is tested, but records on the device are **not encrypted**, there is no app lock or backup, unsynced records are lost if browser data is cleared or the phone is lost, Android packaging is not built, and nothing was tested on a real device.

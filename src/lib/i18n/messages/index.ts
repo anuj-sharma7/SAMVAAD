@@ -15,6 +15,8 @@ import en_publicdata from "./en/publicdata";
 import en_help from "./en/help";
 import en_errors from "./en/errors";
 import en_brief from "./en/brief";
+import en_field from "./en/field";
+import en_sync from "./en/sync";
 import hi_common from "./hi/common";
 import hi_nav from "./hi/nav";
 import hi_login from "./hi/login";
@@ -32,8 +34,10 @@ import hi_publicdata from "./hi/publicdata";
 import hi_help from "./hi/help";
 import hi_errors from "./hi/errors";
 import hi_brief from "./hi/brief";
+import hi_field from "./hi/field";
+import hi_sync from "./hi/sync";
 
-export const NAMESPACES = ["common", "nav", "login", "settings", "dashboard", "schools", "visits", "observe", "feedback", "demo", "report", "followups", "library", "publicdata", "help", "errors", "brief", ] as const;
+export const NAMESPACES = ["common", "nav", "login", "settings", "dashboard", "schools", "visits", "observe", "feedback", "demo", "report", "followups", "library", "publicdata", "help", "errors", "brief", "field", "sync", ] as const;
 
 export const en = {
   ...en_common,
@@ -53,6 +57,8 @@ export const en = {
   ...en_help,
   ...en_errors,
   ...en_brief,
+  ...en_field,
+  ...en_sync,
 };
 
 export type MessageKey = keyof typeof en;
@@ -75,6 +81,8 @@ export const hi: Record<MessageKey, string> = {
   ...hi_help,
   ...hi_errors,
   ...hi_brief,
+  ...hi_field,
+  ...hi_sync,
 };
 
 /** Per-namespace dictionaries, used by tests to detect duplicate keys across namespaces. */
@@ -96,4 +104,6 @@ export const BY_NAMESPACE = {
   help: { en: en_help as Record<string, string>, hi: hi_help as Record<string, string> },
   errors: { en: en_errors as Record<string, string>, hi: hi_errors as Record<string, string> },
   brief: { en: en_brief as Record<string, string>, hi: hi_brief as Record<string, string> },
+  field: { en: en_field as Record<string, string>, hi: hi_field as Record<string, string> },
+  sync: { en: en_sync as Record<string, string>, hi: hi_sync as Record<string, string> },
 };
