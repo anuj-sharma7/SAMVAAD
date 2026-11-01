@@ -65,3 +65,61 @@ test("the left and right arrow keys move between tour steps", async ({ page }) =
   await page.keyboard.press("ArrowLeft"); // stays on the first step
   await expect(dialog).toContainText("Step 1 of 7");
 });
+
+// ---- the welcome tour on the sign-in page, for someone opening the website for the first time ----
+// The config marks the welcome as seen for every other test; here it is cleared once per test (not on every page load).
+async function asFirstTimeVisitor(page: Page) {
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem("welcome-test-reset")) {
+      sessionStorage.setItem("welcome-test-reset", "1");
+      localStorage.removeItem("samvaad.welcome.v1");
+    }
+  });
+}
+
+test("a first-time visitor gets a short welcome on the sign-in page, once", async ({ page }) => {
+  await asFirstTimeVisitor(page);
+  await page.goto("/login");
+  const dialog = page.getByTestId("welcome-tour");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("Welcome to SAMVAAD · Step 1 of 4");
+  await expect(dialog).toContainText("A coaching helper for school mentors");
+  for (const heading of ["Five steps for every visit", "Try it in a minute", "Works on your phone"]) {
+    await dialog.getByRole("button", { name: "Next" }).click();
+    await expect(dialog).toContainText(heading);
+  }
+  await expect(dialog.getByRole("link", { name: "Android app details" })).toHaveAttribute("href", "/download");
+  const a11y = await new AxeBuilder({ page }).analyze();
+  expect(a11y.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+  await dialog.getByRole("button", { name: "Choose a demo person" }).click();
+  await expect(dialog).toBeHidden();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Choose your role" })).toBeVisible();
+  await expect(dialog).toBeHidden(); // not shown again
+});
+
+test("the welcome can be skipped with Escape and replayed from the sign-in page", async ({ page }) => {
+  await asFirstTimeVisitor(page);
+  await page.goto("/login");
+  const dialog = page.getByTestId("welcome-tour");
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await page.getByRole("button", { name: "Take a 1-minute tour" }).click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("Step 1 of 4");
+  await page.keyboard.press("ArrowRight");
+  await expect(dialog).toContainText("Step 2 of 4");
+});
+
+test("the welcome is available in Hindi", async ({ page, context }) => {
+  await context.addCookies([{ name: "samvaad_locale", value: "hi", domain: "localhost", path: "/" }]);
+  await asFirstTimeVisitor(page);
+  await page.goto("/login");
+  const dialog = page.getByTestId("welcome-tour");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("संवाद में आपका स्वागत है");
+  await expect(dialog).toContainText("स्कूल मेंटर के लिए कोचिंग का साथी");
+  await dialog.getByRole("button", { name: "छोड़ें" }).click();
+  await expect(dialog).toBeHidden();
+});
