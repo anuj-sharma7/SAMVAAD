@@ -45,6 +45,8 @@ export const createVisitSchema = z.object({
   scheduled_at: z.string().refine((v) => !Number.isNaN(Date.parse(v)), "Enter a valid date and time"),
   grade: z.coerce.number().int().min(1).max(8),
   subject: z.enum(SUBJECTS),
+  /** Other subjects the visit also covers (up to all of them). The main subject is never repeated here. */
+  extra_subjects: z.array(z.enum(SUBJECTS)).max(SUBJECTS.length - 1).optional(),
   language: z.enum(["en", "hi"]).default("hi"),
   purpose: z.string().trim().min(3, "Select or describe the purpose").max(200),
   coaching_focus: z.string().trim().max(300).optional().or(z.literal("")),
@@ -59,6 +61,11 @@ export const updateVisitSchema = createVisitSchema
   .omit({ school_id: true, save_as: true })
   .partial()
   .extend({ expected_updated_at: z.string().max(40).optional() });
+
+/** Extra subjects without repeats and without the main subject. */
+function otherSubjects(main: string, extra: readonly string[]): string[] {
+  return [...new Set(extra)].filter((x) => x !== main);
+}
 
 const blankToNull = (v: string | undefined | null) => (v && v.trim() ? v.trim() : null);
 
@@ -115,11 +122,12 @@ export function createVisit(db: Db, actor: Actor, input: unknown, opts: { id?: s
   transaction(db, () => {
     run(
       db,
-      `INSERT INTO visits (id, school_id, mentor_id, teacher_alias, scheduled_at, grade, subject, language,
+      `INSERT INTO visits (id, school_id, mentor_id, teacher_alias, scheduled_at, grade, subject, extra_subjects, language,
          purpose, coaching_focus, prep_notes, previous_commitment_id, observation_method, audio_consent,
          status, is_demo, created_at, updated_at)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, 'not_requested', ?, ?, ?, ?)`,
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'not_requested', ?, ?, ?, ?)`,
       id, data.school_id, actor.id, data.teacher_alias, data.scheduled_at, data.grade, data.subject,
+      JSON.stringify(otherSubjects(data.subject, data.extra_subjects ?? [])),
       data.language, data.purpose, blankToNull(data.coaching_focus), blankToNull(data.prep_notes),
       previousId, data.observation_method, data.save_as,
       get<SchoolRow>(db, "SELECT is_demo FROM schools WHERE id = ?", data.school_id)?.is_demo ?? 1,
@@ -134,7 +142,7 @@ export function updateVisit(db: Db, actor: Actor, visitId: string, input: unknow
   const visit = getAuthorizedVisit(db, actor, visitId, "write");
   const { expected_updated_at, ...patch } = updateVisitSchema.parse(input);
   assertNotStale(visit.updated_at, expected_updated_at);
-  const planningOnly = ["teacher_alias", "scheduled_at", "grade", "subject", "language", "purpose", "observation_method"];
+  const planningOnly = ["teacher_alias", "scheduled_at", "grade", "subject", "extra_subjects", "language", "purpose", "observation_method"];
   if (visit.status !== "draft" && visit.status !== "planned") {
     const touched = Object.keys(patch).filter((k) => planningOnly.includes(k));
     if (touched.length) {
@@ -148,9 +156,13 @@ export function updateVisit(db: Db, actor: Actor, visitId: string, input: unknow
   transaction(db, () => {
     run(
       db,
-      `UPDATE visits SET teacher_alias=?, scheduled_at=?, grade=?, subject=?, language=?, purpose=?,
+      `UPDATE visits SET teacher_alias=?, scheduled_at=?, grade=?, subject=?, extra_subjects=?, language=?, purpose=?,
          coaching_focus=?, prep_notes=?, observation_method=?, updated_at=? WHERE id=?`,
-      next.teacher_alias, next.scheduled_at, next.grade, next.subject, next.language, next.purpose,
+      next.teacher_alias, next.scheduled_at, next.grade, next.subject,
+      patch.extra_subjects !== undefined || patch.subject !== undefined
+        ? JSON.stringify(otherSubjects(next.subject, patch.extra_subjects ?? JSON.parse(visit.extra_subjects || "[]")))
+        : visit.extra_subjects,
+      next.language, next.purpose,
       blankToNull(next.coaching_focus), blankToNull(next.prep_notes), next.observation_method,
       nowIso(), visitId,
     );
