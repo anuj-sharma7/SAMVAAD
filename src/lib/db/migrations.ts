@@ -591,4 +591,11 @@ CREATE TABLE issue_photos (
 CREATE INDEX idx_issue_photos_issue ON issue_photos(issue_id);
 `,
   },
+  {
+    id: "0010_visit_extra_subjects",
+    sql: `
+-- A visit can cover several subjects (or all of them). visits.subject stays the main subject; the others are a JSON array of subject ids here.
+ALTER TABLE visits ADD COLUMN extra_subjects TEXT NOT NULL DEFAULT '[]';
+`,
+  },
 ];

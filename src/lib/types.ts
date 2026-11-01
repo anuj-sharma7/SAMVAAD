@@ -46,6 +46,8 @@ export interface VisitRow {
   scheduled_at: string;
   grade: number;
   subject: string;
+  /** JSON array of the other subjects this visit also covers (the main one is `subject`). */
+  extra_subjects: string;
   language: Lang;
   purpose: string;
   coaching_focus: string | null;
