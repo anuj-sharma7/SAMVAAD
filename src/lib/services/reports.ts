@@ -8,6 +8,8 @@ import { currentFeedbackInternal } from "./feedback";
 import { currentDemoInternal } from "./demonstrations";
 import { markVisitCompleted } from "./visits";
 import { requireRole } from "../auth/policy";
+import { loadSchoolCheck } from "./school-check";
+import { problemCount, type CheckAnswers } from "../school-check";
 import type { Actor, Citation, SchoolRow, VisitRow } from "../types";
 
 /** Which parts of the report came from whom. Shown in the UI so AI-drafted text is never passed off as mentor-written. */
@@ -23,6 +25,8 @@ export interface ReportSnapshot {
     practice_observed: string; evidence: string; worked_well: string | null; improvement_area: string | null;
     confirmed_tags: { code: string; label: string }[];
   }[];
+  /** The mentor's school check (problems ticked per area, own words). Absent in reports frozen before this existed. */
+  school_check?: null | { answers: CheckAnswers };
   feedback: null | {
     strength: string; priority_practice: string; next_step: string;
     coaching_questions: { ask: string | null; describe: string | null; ask_again: string | null };
@@ -63,6 +67,7 @@ export function buildSnapshot(db: Db, visit: VisitRow): ReportSnapshot {
   const review = get<{ action_text: string; target_date: string; review_outcome: string; review_evidence: string | null; review_barriers: string | null }>(
     db, "SELECT * FROM commitments WHERE review_visit_id = ? ORDER BY reviewed_at DESC LIMIT 1", visit.id,
   );
+  const check = loadSchoolCheck(db, visit.id);
   const approved = fb?.status === "approved";
   const fbProv: Provenance = fb?.mentor_edited ? "ai_drafted_mentor_edited_approved" : "ai_drafted_mentor_approved";
 
@@ -80,6 +85,7 @@ export function buildSnapshot(db: Db, visit: VisitRow): ReportSnapshot {
               WHERE t.observation_id = ? AND t.confirmed = 1`, o.id,
       ),
     })),
+    school_check: check.updated_at ? { answers: check.answers } : null,
     feedback: approved && fb
       ? {
           strength: fb.strength!, priority_practice: fb.priority_practice!, next_step: fb.next_step!,
@@ -98,6 +104,7 @@ export function buildSnapshot(db: Db, visit: VisitRow): ReportSnapshot {
     sections: {
       visit_details: "system_generated_from_records",
       observations: "mentor_authored",
+      school_check: "mentor_authored",
       feedback: approved ? fbProv : "system_generated_from_records",
       commitment: "mentor_authored",
     },
@@ -116,6 +123,10 @@ export function draftSummary(s: ReportSnapshot): string {
   const lines: string[] = [
     `On ${date}, a Grade ${s.visit.grade} ${s.visit.subject} lesson was observed at ${s.visit.school.name} (${s.observations.length} observation${s.observations.length === 1 ? "" : "s"} recorded).`,
   ];
+  if (s.school_check) {
+    const n = problemCount(s.school_check.answers);
+    lines.push(n > 0 ? `School check: ${n} problem${n === 1 ? "" : "s"} noted across the areas checked.` : "School check: no problems noted in the areas checked.");
+  }
   if (s.previous_commitment_review) {
     const r = s.previous_commitment_review;
     lines.push(`Follow-up on the earlier agreed action ("${r.action_text}"): it ${OUTCOME_TEXT[r.outcome] ?? r.outcome}.`);

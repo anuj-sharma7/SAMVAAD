@@ -1,11 +1,11 @@
-import type { LocalCard, LocalCommitment, LocalObservation, LocalSchool, LocalVisit, SyncState } from "./types";
+import type { LocalCard, LocalCommitment, LocalObservation, LocalSchool, LocalSchoolCheck, LocalVisit, SyncState } from "./types";
 
 /**
  * The draft report built on the device from local records. It is NOT the server report: it is never approved, no AI is used,
  * and it contains no scores, ratings or rankings (the data structure has no field that could hold one).
  */
 export interface LocalReportRecord {
-  kind: "visit" | "observation" | "commitment";
+  kind: "visit" | "observation" | "commitment" | "school_check";
   id: string;
   state: SyncState;
   /** true only when the server acknowledged the latest local change */
@@ -26,6 +26,8 @@ export interface LocalReport {
   observations: Array<{
     id: string; practice: string; evidence: string; workedWell: string | null; improvementArea: string | null; contextNote: string | null; state: SyncState; sent: boolean;
   }>;
+  /** the visit's school check answers, or null when none was recorded */
+  schoolCheck: { answers: LocalSchoolCheck["answers"]; state: SyncState; sent: boolean } | null;
   nextStep: { id: string; action: string; owner: string; targetDate: string; expectedEvidence: string; status: string; state: SyncState; sent: boolean } | null;
   cards: Array<{ id: string; title: string; sourceTitle: string; sourceOrg: string; origin: LocalCard["origin"] }>;
   records: LocalReportRecord[];
@@ -41,9 +43,11 @@ export function buildLocalReport(
   observations: LocalObservation[],
   commitment: LocalCommitment | undefined | null,
   cards: LocalCard[] = [],
+  schoolCheck: LocalSchoolCheck | undefined | null = null,
 ): LocalReport {
   const obs = observations.filter((o) => !o.deleted);
   const records = [rec("visit", visit.id, visit.sync.state), ...obs.map((o) => rec("observation", o.id, o.sync.state))];
+  if (schoolCheck) records.push(rec("school_check", schoolCheck.id, schoolCheck.sync.state));
   if (commitment) records.push(rec("commitment", commitment.id, commitment.sync.state));
   return {
     kind: "local_draft",
@@ -60,6 +64,7 @@ export function buildLocalReport(
       id: o.id, practice: o.practice_observed, evidence: o.evidence, workedWell: o.worked_well, improvementArea: o.improvement_area,
       contextNote: o.context_note, state: o.sync.state, sent: o.sync.state === "synced",
     })),
+    schoolCheck: schoolCheck ? { answers: schoolCheck.answers, state: schoolCheck.sync.state, sent: schoolCheck.sync.state === "synced" } : null,
     nextStep: commitment
       ? {
         id: commitment.id, action: commitment.action_text, owner: commitment.owner_alias, targetDate: commitment.target_date,

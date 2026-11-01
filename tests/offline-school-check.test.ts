@@ -111,3 +111,21 @@ describe("school check in offline field mode", () => {
     expect((await store.getSchoolCheck(v.id))!.sync.state).toBe("failed");
   });
 });
+
+describe("school check in the offline draft report", () => {
+  it("is included with its sync state, and a visit without one reports none", async () => {
+    const { buildLocalReport } = await import("@/lib/offline/report");
+    const { store, school } = await setup();
+    const v = await store.createVisit(visitInput(school.id));
+    await store.transitionVisit(v.id, "in_progress");
+    const visit = (await store.getVisit(v.id))!;
+    expect(buildLocalReport(visit, school, [], null, [], null).schoolCheck).toBeNull();
+
+    const check = await store.saveSchoolCheck(v.id, { toilets: { ids: ["noToilet"], text: "" } });
+    const r = buildLocalReport(visit, school, [], null, [], check);
+    expect(r.schoolCheck?.answers.toilets.ids).toEqual(["noToilet"]);
+    expect(r.schoolCheck?.sent).toBe(false); // saved only on this device
+    expect(r.records.some((x) => x.kind === "school_check" && !x.sent)).toBe(true);
+    expect(r.unsentCount).toBeGreaterThan(0);
+  });
+});

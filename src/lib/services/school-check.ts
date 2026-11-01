@@ -18,8 +18,8 @@ export const schoolCheckSchema = z.object({
 
 export interface SchoolCheckView { answers: CheckAnswers; updated_at: string | null }
 
-export function getSchoolCheck(db: Db, actor: Actor, visitId: string): SchoolCheckView {
-  getAuthorizedVisit(db, actor, visitId, "content");
+/** The stored check for a visit, without any access check (callers must already have authorised the visit). */
+export function loadSchoolCheck(db: Db, visitId: string): SchoolCheckView {
   const rows = all<{ section: string; option_ids: string; other_text: string; updated_at: string }>(
     db, "SELECT section, option_ids, other_text, updated_at FROM school_checks WHERE visit_id = ?", visitId,
   );
@@ -30,6 +30,11 @@ export function getSchoolCheck(db: Db, actor: Actor, visitId: string): SchoolChe
     if (!latest || r.updated_at > latest) latest = r.updated_at;
   }
   return { answers, updated_at: latest };
+}
+
+export function getSchoolCheck(db: Db, actor: Actor, visitId: string): SchoolCheckView {
+  getAuthorizedVisit(db, actor, visitId, "content");
+  return loadSchoolCheck(db, visitId);
 }
 
 /**

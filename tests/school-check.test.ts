@@ -104,3 +104,24 @@ describe("school check service", () => {
     expect(rows[0].metadata).not.toContain("SECRET-WORDS-123");
   });
 });
+
+describe("school check in the report", () => {
+  it("is frozen into the report snapshot (answers only, no score) and mentioned in the draft summary; old reports without it still work", async () => {
+    const { db, me, visitId } = startedVisit();
+    const { generateReport, draftSummary } = await import("@/lib/services/reports");
+    expect(generateReport(db, me, visitId).snapshot.school_check).toBeNull(); // nothing recorded yet
+
+    saveSchoolCheck(db, me, visitId, {
+      answers: { meal: { ids: ["notCooked", "noGas"], text: "" }, toilets: { ids: [NO_ISSUE], text: "" }, extra: { ids: [], text: "Needs a fan" } },
+    });
+    const rep = generateReport(db, me, visitId);
+    expect(rep.snapshot.school_check?.answers.meal.ids).toEqual(["notCooked", "noGas"]);
+    expect(rep.snapshot.sections.school_check).toBe("mentor_authored");
+    expect(JSON.stringify(rep.snapshot.school_check)).not.toMatch(/score|rating|rank/i);
+    expect(draftSummary(rep.snapshot)).toMatch(/School check: 2 problems noted/);
+
+    const old = { ...rep.snapshot } as Partial<typeof rep.snapshot>;
+    delete old.school_check; // a report frozen before the school check existed
+    expect(draftSummary(old as typeof rep.snapshot)).not.toMatch(/School check/);
+  });
+});

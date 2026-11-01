@@ -78,3 +78,28 @@ test("fill the whole school check by tapping, add own words, save, and see it on
   await page.getByRole("link", { name: "Open school check" }).click();
   await expect(page.getByRole("checkbox", { name: "Many children cannot read simple words" })).toBeChecked();
 });
+
+test("the school check appears in the visit report, in the interface language, with no score", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
+  await signIn(page);
+  // the visit used above is the first in-progress one that has a saved check
+  const list = await (await page.request.get("/api/v1/visits?status=in_progress&pageSize=50")).json();
+  const items: { id: string }[] = list.data?.items ?? list.items ?? [];
+  let id = "";
+  for (const v of items) {
+    const c = await (await page.request.get(`/api/v1/visits/${v.id}/school-check`)).json();
+    if (Object.keys((c.data ?? c).answers ?? {}).length > 0) { id = v.id; break; }
+  }
+  expect(id).toBeTruthy();
+
+  await page.goto(`/visits/${id}/report`);
+  await page.getByRole("button", { name: "Prepare report from saved records" }).click();
+  const box = page.getByTestId("school-check-summary");
+  await expect(box).toBeVisible();
+  await expect(box).toContainText("6 problems noted");
+  await expect(box).toContainText("Many children cannot read simple words");
+  await expect(box).toContainText("Meal was served late");
+  await expect(box).toContainText("School needs a new fan in room 2."); // closing note
+  await expect(box).toContainText("not a score");
+  await expect(page.getByRole("article").getByText("School check: 6 problems noted across the areas checked.")).toBeVisible(); // draft summary text
+});

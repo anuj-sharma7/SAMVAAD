@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n/client";
 import { useLive } from "@/lib/offline/field-context";
 import { hrefTo } from "@/lib/offline/use-hash-route";
 import { buildLocalReport } from "@/lib/offline/report";
+import { SchoolCheckSummary } from "@/components/school-check-summary";
 import { commitmentStatusKey, fmtDate, fmtDateTime, visitStatusKey } from "@/lib/format";
 import { classLabel, purposeLabel } from "@/lib/visit-labels";
 
@@ -15,9 +16,9 @@ export function LocalReportScreen({ visitId }: { visitId: string }) {
   const { data, loading } = useLive(async (s) => {
     const visit = await s.getVisit(visitId);
     if (!visit) return null;
-    const [schools, observations, commitments] = await Promise.all([s.listSchools(), s.listObservations(visitId), s.listCommitments(visitId)]);
+    const [schools, observations, commitments, check] = await Promise.all([s.listSchools(), s.listObservations(visitId), s.listCommitments(visitId), s.getSchoolCheck(visitId)]);
     const commitment = commitments.find((c) => c.status !== "cancelled") ?? null;
-    return { report: buildLocalReport(visit, schools.find((x) => x.id === visit.school_id), observations, commitment), commitmentStatus: commitment?.status };
+    return { report: buildLocalReport(visit, schools.find((x) => x.id === visit.school_id), observations, commitment, [], check), commitmentStatus: commitment?.status };
   }, [visitId]);
 
   if (loading && !data) return <p role="status" className="p-4 text-ink-600">{t("common.loading")}</p>;
@@ -65,6 +66,11 @@ export function LocalReportScreen({ visitId }: { visitId: string }) {
         </ol>
       </section>
 
+      <section aria-labelledby="rep-check" className="space-y-2">
+        <h2 id="rep-check" className="text-base font-semibold text-ink-900">{t("check.report.title")}</h2>
+        {r.schoolCheck ? <SchoolCheckSummary answers={r.schoolCheck.answers} /> : <p className="text-sm text-ink-600">{t("check.report.none")}</p>}
+      </section>
+
       <section aria-labelledby="rep-next" className="space-y-2">
         <h2 id="rep-next" className="text-base font-semibold text-ink-900">{t("field.next.title")}</h2>
         {r.nextStep ? (
@@ -84,7 +90,7 @@ export function LocalReportScreen({ visitId }: { visitId: string }) {
         <ul className="space-y-1 text-sm">
           {r.records.map((rec, i) => {
             const n = r.records.slice(0, i).filter((x) => x.kind === "observation").length + 1;
-            const label = rec.kind === "visit" ? t("field.report.kindVisit") : rec.kind === "commitment" ? t("field.next.title") : t("field.report.obsN", { n });
+            const label = rec.kind === "visit" ? t("field.report.kindVisit") : rec.kind === "commitment" ? t("field.next.title") : rec.kind === "school_check" ? t("check.report.title") : t("field.report.obsN", { n });
             return <li key={`${rec.kind}-${rec.id}`}>{label}: {stateText(rec.state)}</li>;
           })}
         </ul>

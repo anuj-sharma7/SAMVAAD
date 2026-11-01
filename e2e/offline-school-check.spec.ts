@@ -82,5 +82,13 @@ test("fill the school check with no internet, keep it pending, then sync it once
   const check = await (await ctx2.request.get(`${ORIGIN}/api/v1/visits/${id}/school-check`)).json();
   expect(check.data.answers.meal.ids).toEqual(["lateServed"]);
   expect(check.data.answers.extra.text).toBe("Needs a new fan in room 2.");
+
+  // the local draft report shows the school check too
+  await page2.getByTestId("report-link").click();
+  const box = page2.getByTestId("school-check-summary");
+  await expect(box).toBeVisible();
+  await expect(box).toContainText("5 problems noted");
+  await expect(box).toContainText("Meal was served late");
+  await expect(box).toContainText("Needs a new fan in room 2.");
   await ctx2.close();
 });

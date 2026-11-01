@@ -4,6 +4,7 @@ import { Chip, DefinitionRow } from "./ui";
 import { fmtDate, fmtDateTime, outcomeKey } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
 import type { ReportSnapshot } from "@/lib/services/reports";
+import { SchoolCheckSummary } from "./school-check-summary";
 
 // Tone is only decoration: every provenance chip carries its meaning in text, so the report reads in monochrome.
 const PROV_TONE: Record<string, "teal" | "amber" | "neutral"> = {
@@ -81,6 +82,12 @@ export function ReportDocument({
           </ol>
         )}
       </Section>
+
+      {s.school_check && (
+        <Section title={t("check.report.title")} prov="mentor_authored">
+          <SchoolCheckSummary answers={s.school_check.answers} />
+        </Section>
+      )}
 
       {s.feedback && (
         <Section title={t("report.doc.approvedFeedback")} prov={s.feedback.provenance}>
