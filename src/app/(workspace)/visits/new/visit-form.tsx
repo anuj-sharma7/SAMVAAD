@@ -11,6 +11,7 @@ import { Field, Input, Select, Textarea } from "@/components/forms";
 import { fmtDate } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
 import { PURPOSES, SUBJECTS, purposeLabel, subjectLabel } from "@/lib/visit-labels";
+import { ALL_SUBJECTS, normalizeSubjects, splitSubjects, toggleSubject } from "@/lib/visit-subjects";
 import { ChoiceQuestion, QuestionWizard } from "@/components/choice-question";
 import { VoiceButton, VoiceHint, appendSpoken } from "@/components/voice-input";
 import { FOCUS_OPTIONS, composeAnswer, emptyAnswer, type Answer } from "@/lib/guided";
@@ -35,7 +36,13 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
   const [schoolId, setSchoolId] = useState(defaultSchool ?? "");
   const [alias, setAlias] = useState("");
   const [language, setLanguage] = useState<string>(defaultLanguage);
-  const [subject, setSubject] = useState("Hindi");
+  // Subjects in the order they were picked (plus the "all" marker when every subject is chosen). The first is the main subject.
+  const [chosen, setChosen] = useState<string[]>([]); // empty until the mentor picks; the full form then shows Hindi as the default main subject
+  const { subject, extra } = splitSubjects(chosen);
+  const allCovered = normalizeSubjects(chosen).includes(ALL_SUBJECTS);
+  const setMainSubject = (s: string) => { setChosen(normalizeSubjects([s, ...extra.filter((x) => x !== s)])); if (s === "Hindi") setLanguage("hi"); };
+  const toggleExtra = (s: string) => setChosen(normalizeSubjects([subject, ...(extra.includes(s) ? extra.filter((x) => x !== s) : [...extra, s])]));
+  const surveyAll = () => setChosen(allCovered ? [subject] : normalizeSubjects([subject, ...SUBJECTS.filter((x) => x !== subject)]));
   const [purpose, setPurpose] = useState<string>(PURPOSES[0]);
   const [ignorePrev, setIgnorePrev] = useState(false);
   // Planning starts as one question at a time; the answers fill the same fields as the full form, which opens at the end for a check.
@@ -60,7 +67,7 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
     const v = await run(
       () =>
         api<{ id: string }>("POST", "/visits", {
-          school_id: schoolId, teacher_alias: alias, scheduled_at: when ? new Date(when).toISOString() : "", grade: Number(d.get("grade")), subject, language, purpose,
+          school_id: schoolId, teacher_alias: alias, scheduled_at: when ? new Date(when).toISOString() : "", grade: Number(d.get("grade")), subject, extra_subjects: extra, language, purpose,
           coaching_focus: String(d.get("coaching_focus") ?? ""), prep_notes: String(d.get("prep_notes") ?? ""),
           previous_commitment_id: prev?.id ?? "", observation_method: d.get("observation_method"), save_as,
         }, { idempotencyKey: submitKey.current }),
@@ -118,10 +125,11 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
                 options={GRADES.map((g) => ({ id: String(g), label: t("visits.grade", { grade: g }) }))} value={one(grade)} onChange={single("grade", (v) => setGrade(v || "2"))} />,
             },
             {
-              key: "subject", required: true, canNext: true,
-              node: <ChoiceQuestion name="vq-subject" title={t("visits.q.subject.title")} multiple={false} textMode="none"
-                options={SUBJECTS.map((s) => ({ id: s, label: subjectLabel(t, s) }))} value={one(subject)}
-                onChange={single("subject", (v) => { setSubject(v || "Hindi"); if (v === "Hindi") setLanguage("hi"); })} />,
+              key: "subject", required: true, canNext: chosen.some((i) => i !== ALL_SUBJECTS),
+              node: <ChoiceQuestion name="vq-subject" title={t("visits.q.subjects.title")} hint={t("visits.q.subjects.hint")} multiple textMode="none"
+                options={[{ id: ALL_SUBJECTS, label: t("visits.q.subjects.all") }, ...SUBJECTS.map((s) => ({ id: s, label: subjectLabel(t, s) }))]}
+                value={{ ids: chosen, text: "" }} toggle={toggleSubject}
+                onChange={(a) => { const next = normalizeSubjects(a.ids); setChosen(next); if (splitSubjects(next).subject === "Hindi" && next.includes("Hindi")) setLanguage("hi"); }} />,
             },
             {
               key: "purpose", required: true, canNext: true,
@@ -171,9 +179,21 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
               <Select id="grade" name="grade" value={grade} onChange={(e) => setGrade(e.target.value)} error={f.grade}>{GRADES.map((g) => <option key={g} value={g}>{t("visits.grade", { grade: g })}</option>)}</Select>
             </Field>
             <Field label={t("visits.new.subject")} htmlFor="subject" required error={f.subject}>
-              <Select id="subject" value={subject} onChange={(e) => { setSubject(e.target.value); if (e.target.value === "Hindi") setLanguage("hi"); }} error={f.subject}>{SUBJECTS.map((s) => <option key={s} value={s}>{subjectLabel(t, s)}</option>)}</Select>
+              <Select id="subject" value={subject} onChange={(e) => setMainSubject(e.target.value)} error={f.subject}>{SUBJECTS.map((s) => <option key={s} value={s}>{subjectLabel(t, s)}</option>)}</Select>
             </Field>
           </div>
+          <fieldset className="space-y-2" data-testid="also-cover">
+            <legend className="text-sm font-medium text-ink-900">{t("visits.new.alsoCover")}</legend>
+            <p className="text-[13px] text-ink-600">{t("visits.new.alsoCoverHint")}</p>
+            <div className="flex flex-wrap gap-2">
+              {SUBJECTS.filter((x) => x !== subject).map((x) => (
+                <label key={x} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-line-strong bg-card px-3 text-sm has-[:checked]:border-teal-700 has-[:checked]:bg-teal-50">
+                  <input type="checkbox" checked={extra.includes(x)} onChange={() => toggleExtra(x)} className="h-4 w-4 accent-teal-700" /> {subjectLabel(t, x)}
+                </label>
+              ))}
+            </div>
+            <Button type="button" variant="secondary" size="sm" onClick={surveyAll}>{allCovered ? t("visits.new.surveyAllClear") : t("visits.new.surveyAll")}</Button>
+          </fieldset>
           <Field label={t("visits.new.language")} htmlFor="language" hint={t("visits.new.languageHint")} error={f.language}>
             <Select id="language" value={language} onChange={(e) => setLanguage(e.target.value)}>
               <option value="hi">{t("visits.new.langHi")}</option>
