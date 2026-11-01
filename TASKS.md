@@ -123,3 +123,20 @@ Baseline: `docs/MOBILE_OFFLINE_BASELINE.md`. Decision: `docs/MOBILE_ARCHITECTURE
 | Android debug build, real-device tests | not built / not tested |
 
 Not done: encryption at rest, app lock, backup/export, Capacitor/Android, background sync. Field-pilot gate NOT met.
+
+## Mentor Help, coaching guide and presentations (2026-11-01)
+
+- [x] **Mentor Help** (migration 0008): academic problems with status and instant AI suggestion; class 1–8 × six subjects question sets with tap-to-answer and AI review; mid-day meal and school-ground question sets. Opens from a visit's Observe page with class, subject and school prefilled.
+- [x] **Photos on problems** (migration 0009): up to 3, shrunk in the browser (location data removed), file type checked from the first bytes on the server, owner-only access.
+- [x] **Coaching guide** on the feedback page: live wording check and conversation advice (new AI task `coach`; never changes the card).
+- [x] Science, Social Science and Sanskrit added to visit subjects; AI Hindi rewritten as everyday Hinglish; login page gets a logo and an app-download button.
+- [x] README rewritten (live link, diagrams, charts from real data, screenshots, limitations); presentations added in `docs/presentation/`.
+
+| Check | Result |
+|---|---|
+| tsc / eslint | pass / pass |
+| `npx vitest run` | 395 / 395 (29 files) |
+| `npx playwright test` | 42 / 42 (one older knowledge-base test occasionally fails under load and passes alone) |
+| Live AI provider, real device, real users | NOT RUN |
+
+Not done: real authentication, encryption of phone data, Hindi and question-bank review by an educator, Mentor Help offline, native Android parity for Mentor Help. Gates C and D remain NOT MET.
