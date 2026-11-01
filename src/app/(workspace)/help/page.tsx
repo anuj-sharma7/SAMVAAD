@@ -10,7 +10,7 @@ export async function generateMetadata() {
 }
 
 const STEPS = ["plan", "observe", "coach", "demonstrate", "followup"] as const;
-const FAQ = ["noSource", "why", "save", "voice", "demo", "lang"] as const;
+const FAQ = ["noSource", "why", "save", "voice", "demo", "lang", "subjects", "mentorHelp", "tour"] as const;
 
 export default async function HelpPage() {
   await requireActor();
