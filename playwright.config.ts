@@ -15,7 +15,7 @@ export default defineConfig({
   // (specs that test the Hindi switch set the cookie themselves through the language toggle).
   use: {
     baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure", screenshot: "only-on-failure",
-    storageState: { cookies: [{ name: "samvaad_locale", value: "en", domain: "localhost", path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }], origins: [] },
+    storageState: { cookies: [{ name: "samvaad_locale", value: "en", domain: "localhost", path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }], origins: [{ origin: `http://localhost:${PORT}`, localStorage: [{ name: "samvaad.welcome.v1", value: "seen" }] }] },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1360, height: 900 } } },
