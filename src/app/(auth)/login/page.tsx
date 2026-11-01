@@ -11,6 +11,7 @@ import { ToastProvider } from "@/components/toast";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getI18n } from "@/lib/i18n/server";
 import { APP_RELEASE, apkSizeLabel } from "@/lib/app-release";
+import { ReplayWelcomeButton, WelcomeTour } from "@/components/welcome-tour";
 
 export async function generateMetadata() {
   const { t } = await getI18n();
@@ -26,6 +27,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { t, locale } = await getI18n();
   return (
     <ToastProvider>
+      <WelcomeTour />
       <main id="main" className="grid min-h-screen grid-cols-[minmax(0,1fr)] lg:grid-cols-[1.05fr_1fr]">
         <section className="relative order-last flex flex-col justify-between bg-ink-900 px-8 py-10 text-white sm:px-14 sm:py-14 lg:order-none">
           <div className="flex items-center gap-3">
@@ -83,6 +85,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </div>
             <h2 className="text-2xl font-semibold tracking-tight">{t("login.title")}</h2>
             <p className="mt-1.5 text-ink-600">{t("login.subtitle")}</p>
+            <div className="mt-1"><ReplayWelcomeButton /></div>
 
             <Notice tone="warning" title={t("login.demoNoticeTitle")} className="mt-6">
               {t("login.demoNoticeBody")}
