@@ -60,7 +60,13 @@ export type CreateVisitInput = z.infer<typeof createVisitSchema>;
 export const updateVisitSchema = createVisitSchema
   .omit({ school_id: true, save_as: true })
   .partial()
-  .extend({ expected_updated_at: z.string().max(40).optional() });
+  // `language` and `observation_method` have defaults on create. On update they must be truly optional, otherwise changing any other
+  // field would silently reset them to the defaults.
+  .extend({
+    language: z.enum(["en", "hi"]).optional(),
+    observation_method: z.enum(["text", "checklist"]).optional(),
+    expected_updated_at: z.string().max(40).optional(),
+  });
 
 /** Extra subjects without repeats and without the main subject. */
 function otherSubjects(main: string, extra: readonly string[]): string[] {
