@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "./ui";
+import { Button, cn } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 import { stepsFor } from "@/lib/tour";
 import type { Role } from "@/lib/types";
@@ -56,11 +56,22 @@ export function FirstRunTour({ role }: { role: Role }) {
     <dialog
       ref={ref}
       aria-labelledby="tour-title"
+      onKeyDown={(e) => {
+        // Left and right arrows move between steps (Escape is handled by the dialog itself)
+        if (e.key === "ArrowRight" && step < steps.length - 1) setStep(step + 1);
+        if (e.key === "ArrowLeft" && step > 0) setStep(step - 1);
+      }}
       onClose={() => { setIsOpen(false); try { localStorage.setItem(KEY, "seen"); } catch { /* ignore */ } }}
       className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-2xl border border-line bg-card p-0 text-ink-900 shadow-xl backdrop:bg-ink-900/50"
     >
       <div className="space-y-4 p-6">
         <p className="text-[13px] font-medium text-ink-600">{t("help.tour.title")} · {t("help.tour.stepOf", { n: step + 1, total: steps.length })}</p>
+        {/* Decorative progress: the "Step n of N" line above is what assistive technology reads, and Back / Next do the moving. */}
+        <ol className="flex flex-wrap gap-1.5" aria-hidden>
+          {steps.map((st, i) => (
+            <li key={st.id} className={cn("h-2.5 rounded-full border transition-all", i === step ? "w-6 border-teal-700 bg-teal-700" : i < step ? "w-2.5 border-teal-700 bg-teal-700/60" : "w-2.5 border-ink-500 bg-white")} />
+          ))}
+        </ol>
         <h2 id="tour-title" className="text-xl font-semibold tracking-tight">{t(`help.tour.${id}.title`)}</h2>
         <p className="text-base leading-relaxed">{t(`help.tour.${id}.body`)}</p>
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
