@@ -10,7 +10,7 @@ What changed in SAMVAAD, newest first. This is a prototype on fictional data; no
 - **First-run tour in the app** now has 7 steps for mentors (4 for other roles), rings the menu item it is talking about on wide screens, shows progress, and works with the arrow keys.
 - **Mentor Help**: a question set can be **copied as plain text** (for WhatsApp) or **printed / saved as PDF**.
 - **Help**: two outdated FAQ answers corrected (offline and voice now exist) and three new entries.
-- Tests: 415 unit and 53 browser tests passing.
+- Tests: 417 unit and 54 browser tests passing.
 
 ## 2026-11-01
 
