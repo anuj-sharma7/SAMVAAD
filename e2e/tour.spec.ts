@@ -49,3 +49,19 @@ test("supervisors see only the four general steps", async ({ page }) => {
   const a11y = await new AxeBuilder({ page }).analyze();
   expect(a11y.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
 });
+
+test("the left and right arrow keys move between tour steps", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
+  await signIn(page, "demo-mentor-asha");
+  await openTourFromHelp(page);
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toContainText("Step 1 of 7");
+  await page.keyboard.press("ArrowRight");
+  await expect(dialog).toContainText("Step 2 of 7");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowLeft");
+  await expect(dialog).toContainText("Step 2 of 7");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowLeft"); // stays on the first step
+  await expect(dialog).toContainText("Step 1 of 7");
+});
