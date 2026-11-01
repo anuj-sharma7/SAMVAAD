@@ -8,7 +8,7 @@ import { getActor } from "../server/context";
 
 const DICT = { en, hi } as const;
 
-/** UI locale for this request: explicit cookie > signed-in profile preference > English. Cached per request. */
+/** UI locale for this request: explicit cookie > signed-in profile preference > Hindi (DEFAULT_LOCALE). Cached per request. */
 export const getLocale = cache(async (): Promise<Locale> => {
   const c = (await cookies()).get(LOCALE_COOKIE)?.value;
   if (isLocale(c)) return c;

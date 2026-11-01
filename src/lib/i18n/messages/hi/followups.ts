@@ -22,7 +22,7 @@ const m: Record<keyof typeof en, string> = {
   "followups.owner.mentor": "मेंटर",
   "followups.dateWithRelative": "{date} ({relative})",
   "followups.notScheduled": "तय नहीं है · ",
-  "followups.planOne": "योजना बनाएँ",
+  "followups.planOne": "प्लान करें",
   "followups.recorded": "दर्ज किया गया {date}",
   "followups.reviewEvidence": "जो देखा:",
   "followups.reviewBarriers": "रुकावटें / ज़रूरी सहयोग:",

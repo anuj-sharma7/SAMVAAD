@@ -56,7 +56,7 @@ test("login page switches to Hindi; the choice persists across reload and sign-i
   await expect(page.locator("body")).not.toContainText("Sign in");
   expect(await page.locator("body").innerText()).not.toMatch(KEY_PATTERN);
   await page.screenshot({ path: "e2e-screenshots/20-login-hi.png", fullPage: true });
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   await expect(page.locator("html")).toHaveAttribute("lang", "hi");
 });
@@ -64,7 +64,7 @@ test("login page switches to Hindi; the choice persists across reload and sign-i
 test("every main page renders in Hindi with no raw keys, no English interface copy and no axe violations", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen")); // tour has its own test
   await setHindi(page);
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   const problems: string[] = [];
   const routes = ["/dashboard", "/schools", "/visits", "/visits/new", "/follow-ups", "/practice-library", "/public-data", "/public-data/sources", "/reports", "/feedback", "/demonstrate", "/settings", "/help"];
@@ -86,7 +86,7 @@ test("every main page renders in Hindi with no raw keys, no English interface co
 test("the visit workflow pages work in Hindi (visit page, observe, feedback, report, brief, summary)", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
   await setHindi(page);
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   await page.goto("/visits");
   await page.waitForLoadState("networkidle");
@@ -112,7 +112,7 @@ test("Hindi layout on a phone-sized screen has no horizontal overflow", async ({
   const page = await ctx.newPage();
   await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
   await setHindi(page);
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   const overflow: string[] = [];
   for (const url of ["/dashboard", "/schools", "/visits", "/visits/new", "/follow-ups", "/practice-library", "/public-data", "/settings", "/help"]) {
@@ -132,7 +132,7 @@ test("English text and Hindi text zoomed to 200% still reflow (no horizontal scr
   const page = await ctx.newPage();
   await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
   await setHindi(page);
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   for (const url of ["/dashboard", "/visits/new", "/settings"]) {
     await page.goto(url);
     await page.waitForLoadState("networkidle");
@@ -144,7 +144,7 @@ test("English text and Hindi text zoomed to 200% still reflow (no horizontal scr
 
 test("first-run tour: appears once, is skippable by keyboard, closes with Escape, replays from Help", async ({ page }) => {
   await page.goto("/login");
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
@@ -168,7 +168,7 @@ test("first-run tour: appears once, is skippable by keyboard, closes with Escape
 test("glossary search filters in the active language", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
   await page.goto("/login");
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/dashboard/);
   await page.goto("/help");
   await page.waitForLoadState("networkidle");
@@ -180,7 +180,7 @@ test("glossary search filters in the active language", async ({ page }) => {
 
 test("brief and teacher summary: planned visits show a brief; a finished visit has a printable one-page summary", async ({ page }) => {
   await page.goto("/login");
-  await page.getByRole("button", { name: /Asha/ }).click();
+  await page.getByRole("button", { name: /Asha|आशा/ }).click();
   await expect(page).toHaveURL(/dashboard/);
   const list = await (await page.request.get("/api/v1/visits?limit=100")).json();
   const items = list.data.items as { id: string; status: string }[];

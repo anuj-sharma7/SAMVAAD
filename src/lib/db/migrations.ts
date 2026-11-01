@@ -509,4 +509,21 @@ CREATE TABLE sync_operations (
 CREATE INDEX idx_sync_ops_actor ON sync_operations(actor_id, created_at);
 `,
   },
+  {
+    id: "0007_school_checks",
+    sql: `
+-- School check: the mentor's tap-to-answer problem list for a visit, one row per section (children, building, meal, toilets, records,
+-- teachers, safety, plus a closing free note). option_ids holds option ids from a fixed list; other_text is the mentor's own words.
+-- No score or rating column exists by design.
+CREATE TABLE school_checks (
+  visit_id    TEXT NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
+  section     TEXT NOT NULL CHECK (section IN ('learning','building','meal','toilets','records','teachers','safety','extra')),
+  option_ids  TEXT NOT NULL DEFAULT '[]',
+  other_text  TEXT NOT NULL DEFAULT '',
+  updated_by  TEXT NOT NULL REFERENCES profiles(id),
+  updated_at  TEXT NOT NULL,
+  PRIMARY KEY (visit_id, section)
+);
+`,
+  },
 ];

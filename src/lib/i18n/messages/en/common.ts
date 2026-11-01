@@ -126,5 +126,18 @@ const m = {
   "common.ui.originOfficialTitle": "Backed by verbatim excerpts from an official published document",
   "common.ui.originIllustrative": "Illustrative · no external source",
   "common.ui.originIllustrativeTitle": "Written for the prototype; no external source behind it",
+  "common.voice.start": "Speak",
+  "common.voice.stop": "Stop",
+  "common.voice.listening": "Listening… speak now.",
+  "common.voice.denied": "The microphone is blocked. Allow it in the browser settings, or type instead.",
+  "common.voice.noSpeech": "Nothing was heard. Tap Speak and try again.",
+  "common.voice.noMic": "No microphone was found.",
+  "common.voice.network": "Voice typing needs the internet.",
+  "common.voice.failed": "Voice typing did not work. Please type instead.",
+  "common.voice.hint": "Tap Speak to fill a box by voice. Your browser turns speech into text and usually needs the internet. Check the text before saving. Do not say children’s names.",
+  "common.voice.unsupported": "Voice typing is not available in this browser. Please type.",
+  "common.guided.other": "Something else (type or speak)",
+  "common.guided.progress": "Question {n} of {total}",
+  "common.guided.progressLabel": "Progress",
 };
 export default m;

@@ -1,6 +1,7 @@
 export const LOCALES = ["en", "hi"] as const;
 export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = "en";
+/** Rajasthan-first: Hindi unless the user (cookie) or their saved profile preference says otherwise. */
+export const DEFAULT_LOCALE: Locale = "hi";
 /** UI language preference (separate from the coaching/content language chosen per visit). */
 export const LOCALE_COOKIE = "samvaad_locale";
 export const isLocale = (v: unknown): v is Locale => typeof v === "string" && (LOCALES as readonly string[]).includes(v);

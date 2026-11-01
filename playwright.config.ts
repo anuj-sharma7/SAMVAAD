@@ -11,7 +11,12 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   reporter: [["list"]],
-  use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure", screenshot: "only-on-failure" },
+  // The app now defaults to Hindi; the existing specs assert English copy, so they pin English with the locale cookie
+  // (specs that test the Hindi switch set the cookie themselves through the language toggle).
+  use: {
+    baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure", screenshot: "only-on-failure",
+    storageState: { cookies: [{ name: "samvaad_locale", value: "en", domain: "localhost", path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }], origins: [] },
+  },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1360, height: 900 } } },
   ],

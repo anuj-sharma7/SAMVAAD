@@ -59,6 +59,7 @@ export const CONFLICT_FIELDS: Record<EntityType, string[]> = {
   visit: ["teacher_alias", "scheduled_at", "grade", "subject", "language", "purpose", "coaching_focus", "prep_notes", "observation_method", "status"],
   observation: ["practice_observed", "evidence", "worked_well", "improvement_area", "context_note"],
   commitment: ["action_text", "owner_role", "owner_alias", "target_date", "expected_evidence", "status"],
+  school_check: [], // saved as a full replace with no version check, so it never raises a conflict
 };
 
 const norm = (v: unknown) => (v === undefined || v === null || v === "" ? null : v);

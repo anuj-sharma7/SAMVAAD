@@ -11,6 +11,9 @@ import { Field, Select, Textarea } from "@/components/forms";
 import { useI18n } from "@/lib/i18n/client";
 import { useUnsavedWarning } from "@/lib/client/use-unsaved-warning";
 import { visitStatusKey } from "@/lib/format";
+import { ChoiceQuestion, QuestionWizard } from "@/components/choice-question";
+import { VoiceButton, VoiceHint, appendSpoken } from "@/components/voice-input";
+import { OBSERVATION_QUESTIONS, composeObservation, emptyAnswer, hasAnswer, questionComplete, type Answer, type Question } from "@/lib/guided";
 
 interface Tag { code: string; label: string; domain: string; source: "mentor" | "suggested"; confirmed: boolean; match_strength: number | null; matched_terms: string[] }
 interface Obs { id: string; updated_at: string; practice_observed: string; evidence: string; worked_well: string | null; improvement_area: string | null; context_note: string | null; tags: Tag[] }
@@ -28,13 +31,19 @@ function ObservationForm({ visitId, initial, onDone, onCancel }: { visitId: stri
   });
   const submitKey = useRef(newKey()); // a double-click on Save must not record the observation twice
   const f = error?.fields ?? {};
+  // A new observation starts with tap-to-answer questions; they fill the same fields as the form (no new stored data, no scoring).
+  const [mode, setMode] = useState<"guided" | "form">(initial ? "form" : "guided");
+  const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  const labelOf = (q: Question, o: string) => t(`observe.q.${q.id}.o.${o}`);
+  const answerOf = (id: string) => answers[id] ?? emptyAnswer();
 
   // Unsaved text is kept in memory only (never in browser storage: observations can be sensitive); the browser asks before the
   // page is closed or reloaded while there are unsaved changes.
-  const dirty = Object.values(v).some(Boolean) && !initial;
+  const dirty = (Object.values(v).some(Boolean) || Object.values(answers).some(hasAnswer)) && !initial;
   useUnsavedWarning(dirty);
 
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLTextAreaElement>) => setV((x) => ({ ...x, [k]: e.target.value }));
+  const speak = (k: keyof typeof v) => (s: string) => setV((x) => ({ ...x, [k]: appendSpoken(x[k], s) }));
   const allText = Object.values(v).join(" ");
   const flagged = EVALUATIVE.test(allText) || EVALUATIVE_HI.test(allText);
 
@@ -43,29 +52,69 @@ function ObservationForm({ visitId, initial, onDone, onCancel }: { visitId: stri
       success: initial ? t("observe.updated") : t("observe.saved"),
     });
     if (res) {
-      if (!initial) { setV({ practice_observed: "", evidence: "", worked_well: "", improvement_area: "", context_note: "" }); submitKey.current = newKey(); }
+      if (!initial) { setV({ practice_observed: "", evidence: "", worked_well: "", improvement_area: "", context_note: "" }); setAnswers({}); setMode("guided"); submitKey.current = newKey(); }
       onDone();
     }
   }
 
+  if (mode === "guided") {
+    return (
+      <div className="p-5" data-testid="guided-observation">
+        <QuestionWizard
+          header={(
+            <div className="space-y-2">
+              <p className="text-sm text-ink-700">{t("observe.guided.intro")}</p>
+              <VoiceHint />
+              <button type="button" className="min-h-11 text-sm font-medium text-ink-700 underline" onClick={() => setMode("form")}>{t("observe.guided.direct")}</button>
+            </div>
+          )}
+          steps={OBSERVATION_QUESTIONS.map((q) => ({
+            key: q.id, required: q.required, canNext: questionComplete(q, answerOf(q.id)),
+            node: (
+              <ChoiceQuestion
+                name={`oq-${q.id}`} title={t(`observe.q.${q.id}.title`)} hint={t(`observe.q.${q.id}.hint`)}
+                options={q.options.map((o) => ({ id: o, label: labelOf(q, o) }))} multiple={q.multiple}
+                value={answerOf(q.id)} onChange={(a) => setAnswers((x) => ({ ...x, [q.id]: a }))}
+                textMode={q.text} textLabel={t(`observe.q.${q.id}.text`)}
+              />
+            ),
+          }))}
+          finishLabel={t("observe.guided.finish")}
+          onFinish={() => { setV(composeObservation(labelOf, answers)); setMode("form"); }}
+        />
+      </div>
+    );
+  }
+
   return (
     <form noValidate onSubmit={(e) => { e.preventDefault(); void submit(); }} className="space-y-4 p-5">
+      {!initial && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-teal-50 px-3 py-2 text-sm text-teal-700">
+          <span>{t("observe.guided.reviewNote")}</span>
+          <button type="button" className="min-h-11 font-medium underline" onClick={() => setMode("guided")}>{t("observe.guided.useQuestions")}</button>
+        </div>
+      )}
       <Field label={t("observe.practice")} htmlFor={`po-${initial?.id ?? "n"}`} required error={f.practice_observed} hint={t("observe.practiceHint")}>
         <Textarea id={`po-${initial?.id ?? "n"}`} value={v.practice_observed} onChange={set("practice_observed")} maxLength={1500} error={f.practice_observed} />
+        <VoiceButton onText={speak("practice_observed")} />
       </Field>
       <Field label={t("observe.evidence")} htmlFor={`ev-${initial?.id ?? "n"}`} required error={f.evidence} hint={t("observe.evidenceHint")}>
         <Textarea id={`ev-${initial?.id ?? "n"}`} value={v.evidence} onChange={set("evidence")} maxLength={2000} error={f.evidence} />
+        <VoiceButton onText={speak("evidence")} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("observe.workedWell")} htmlFor={`ww-${initial?.id ?? "n"}`} error={f.worked_well}>
           <Textarea id={`ww-${initial?.id ?? "n"}`} value={v.worked_well} onChange={set("worked_well")} maxLength={1500} className="min-h-[72px]" />
+          <VoiceButton onText={speak("worked_well")} />
         </Field>
         <Field label={t("observe.grow")} htmlFor={`ia-${initial?.id ?? "n"}`} error={f.improvement_area} hint={t("observe.growHint")}>
           <Textarea id={`ia-${initial?.id ?? "n"}`} value={v.improvement_area} onChange={set("improvement_area")} maxLength={1500} className="min-h-[72px]" />
+          <VoiceButton onText={speak("improvement_area")} />
         </Field>
       </div>
       <Field label={t("observe.context")} htmlFor={`cn-${initial?.id ?? "n"}`} error={f.context_note}>
         <Textarea id={`cn-${initial?.id ?? "n"}`} value={v.context_note} onChange={set("context_note")} maxLength={500} className="min-h-[56px]" placeholder={t("observe.contextPlaceholder")} />
+        <VoiceButton onText={speak("context_note")} />
       </Field>
       {flagged && <Notice tone="warning" title={t("observe.flaggedTitle")}>{t("observe.flaggedBody")}</Notice>}
       {error && !error.fields && <Notice tone="error">{error.message}</Notice>}

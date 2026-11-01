@@ -80,7 +80,17 @@ export interface LocalCard {
   origin: "illustrative" | "official_source"; localized_hi: { title: string; summary: string; next_step: string; steps: string[]; prompts: string[] } | null;
 }
 
-export type EntityType = "visit" | "observation" | "commitment";
+/** The mentor's tap-to-answer problem list for one visit. One record per visit: its id IS the visit id. */
+export interface LocalSchoolCheck {
+  id: string;
+  visit_id: string;
+  answers: Record<string, { ids: string[]; text: string }>;
+  created_at: string;
+  sync: SyncMeta;
+  origin: "local" | "server";
+}
+
+export type EntityType = "visit" | "observation" | "commitment" | "school_check";
 export type OpKind = "create" | "update" | "delete" | "transition";
 export type OutboxStatus = "queued" | "inflight" | "failed" | "conflict" | "rejected";
 
@@ -137,6 +147,7 @@ export interface Snapshot {
   visits: Array<Omit<LocalVisit, "sync" | "origin"> & { updated_at: string; started_at?: string | null; completed_at?: string | null }>;
   observations: Array<Omit<LocalObservation, "sync" | "origin"> & { updated_at: string }>;
   commitments: Array<Omit<LocalCommitment, "sync" | "origin"> & { updated_at: string }>;
+  school_checks?: Array<Omit<LocalSchoolCheck, "sync" | "origin"> & { updated_at: string }>;
   cards: LocalCard[];
 }
 

@@ -11,6 +11,7 @@ import { getDashboard, getPriorities, practiceGaps } from "../services/dashboard
 import { assignMentor, createSchool, getSchool, listSchools, schoolExtras } from "../services/schools";
 import { createVisit, getVisitDetail, listVisits, transitionVisit, updateVisit, visitProgress } from "../services/visits";
 import { addObservation, decideTags, deleteObservation, listObservations, updateObservation } from "../services/observations";
+import { getSchoolCheck, saveSchoolCheck } from "../services/school-check";
 import { approveFeedback, editFeedback, generateFeedback, getCurrentFeedback, listFeedbackHistory, rejectFeedback } from "../services/feedback";
 import { approveDemonstration, editDemonstration, generateDemonstration, getCurrentDemonstration } from "../services/demonstrations";
 import { createCommitment, getCommitment, listCommitments, reviewCommitment, suggestCommitment, updateCommitment } from "../services/commitments";
@@ -106,6 +107,10 @@ route("POST", "/visits/:id/observations", async (c) => {
 route("PATCH", "/observations/:id", async (c) => updateObservation(c.db, c.actor, c.params.id, await c.json()));
 route("DELETE", "/observations/:id", (c) => { deleteObservation(c.db, c.actor, c.params.id); return { deleted: true }; });
 route("POST", "/observations/:id/tags", async (c) => decideTags(c.db, c.actor, c.params.id, await c.json()));
+
+// ---- school check (problem list by area) -------------------------------------------------------
+route("GET", "/visits/:id/school-check", (c) => getSchoolCheck(c.db, c.actor, c.params.id));
+route("PUT", "/visits/:id/school-check", async (c) => saveSchoolCheck(c.db, c.actor, c.params.id, await c.json()));
 
 // ---- feedback (E3) -----------------------------------------------------------------------------
 route("GET", "/visits/:id/feedback", (c) => ({

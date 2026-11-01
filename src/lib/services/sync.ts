@@ -5,6 +5,7 @@ import { requireRole } from "../auth/policy";
 import { isUuid, nowIso, parseJson } from "../util";
 import { audit } from "./audit";
 import { createVisit, transitionVisit, updateVisit } from "./visits";
+import { saveSchoolCheck } from "./school-check";
 import { addObservation, deleteObservation, updateObservation } from "./observations";
 import { createCommitment, updateCommitment } from "./commitments";
 import { getApprovedCards } from "./practice-cards";
@@ -29,7 +30,7 @@ import type { Actor, VisitStatus } from "../types";
  *   error     a temporary server problem; safe to retry the same operation
  */
 export const MAX_OPS_PER_PUSH = 25;
-const ENTITY = z.enum(["visit", "observation", "commitment"]);
+const ENTITY = z.enum(["visit", "observation", "commitment", "school_check"]);
 const uuid = z.string().refine(isUuid, "must be a UUID");
 
 export const syncOpSchema = z.object({
@@ -74,7 +75,12 @@ function observationRecord(db: Db, id: string) {
 function commitmentRecord(db: Db, id: string) {
   return get<Record<string, unknown>>(db, "SELECT * FROM commitments WHERE id = ?", id);
 }
-const RECORD = { visit: visitRecord, observation: observationRecord, commitment: commitmentRecord } as const;
+/** A school check has no row of its own: its id is the visit id and its version is the newest section update. */
+function schoolCheckRecord(db: Db, id: string) {
+  const row = get<{ updated_at: string | null }>(db, "SELECT MAX(updated_at) AS updated_at FROM school_checks WHERE visit_id = ?", id);
+  return row?.updated_at ? { id, visit_id: id, updated_at: row.updated_at } : undefined;
+}
+const RECORD = { visit: visitRecord, observation: observationRecord, commitment: commitmentRecord, school_check: schoolCheckRecord } as const;
 
 function execute(db: Db, actor: Actor, op: SyncOp): void {
   const withExpected = { ...op.payload, expected_updated_at: op.expected_updated_at };
@@ -102,6 +108,10 @@ function execute(db: Db, actor: Actor, op: SyncOp): void {
       return;
     case "commitment.update":
       updateCommitment(db, actor, op.entity_id, withExpected);
+      return;
+    case "school_check.update":
+      // a full replace of the visit's check; `entity_id` is the visit id
+      saveSchoolCheck(db, actor, op.entity_id, { answers: op.payload.answers });
       return;
     default:
       throw new AppError(422, "unsupported_operation", `Unsupported operation ${op.entity_type}.${op.op}`);
@@ -234,6 +244,17 @@ export function buildSnapshot(db: Db, actor: Actor) {
         ...ids,
       )
     : [];
+  const school_checks = ids.length
+    ? all<{ visit_id: string; section: string; option_ids: string; other_text: string; updated_at: string }>(
+        db, `SELECT visit_id, section, option_ids, other_text, updated_at FROM school_checks WHERE visit_id IN (${marks})`, ...ids,
+      ).reduce<Map<string, { id: string; visit_id: string; answers: Record<string, { ids: string[]; text: string }>; created_at: string; updated_at: string }>>((m, r) => {
+        const cur = m.get(r.visit_id) ?? { id: r.visit_id, visit_id: r.visit_id, answers: {}, created_at: r.updated_at, updated_at: r.updated_at };
+        cur.answers[r.section] = { ids: parseJson<string[]>(r.option_ids, []), text: r.other_text };
+        if (r.updated_at > cur.updated_at) cur.updated_at = r.updated_at;
+        m.set(r.visit_id, cur);
+        return m;
+      }, new Map())
+    : new Map();
   const cards = getApprovedCards(db).map((c) => ({
     id: c.id, version: c.version, title: c.title, domain: c.domain, grade_min: c.grade_min, grade_max: c.grade_max, subject: c.subject,
     description: c.description, steps: c.steps, example_prompts: c.example_prompts, next_step: c.next_step,
@@ -242,6 +263,6 @@ export function buildSnapshot(db: Db, actor: Actor) {
   return {
     server_time: nowIso(),
     account: { id: account.id, display_name: account.displayName, role: account.role, preferred_language: account.preferredLanguage, ui_language: account.uiLanguage },
-    schools, visits, observations, commitments, cards,
+    schools, visits, observations, commitments, school_checks: [...school_checks.values()], cards,
   };
 }

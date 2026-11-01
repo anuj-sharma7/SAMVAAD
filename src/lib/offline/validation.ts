@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CHECK_SECTION_IDS, EXTRA, validOptionIds } from "../school-check";
 
 /**
  * Client-side mirror of the server rules (src/lib/services/{visits,observations,commitments}.ts). It exists so a mentor learns about
@@ -42,6 +43,16 @@ export const commitmentInput = z.object({
   expected_evidence: z.string().trim().min(3, "evidence_required").max(600),
 });
 export type CommitmentInput = z.infer<typeof commitmentInput>;
+
+/** Mirror of the server's school check rules (src/lib/services/school-check.ts): fixed option lists, own words in `text` only. */
+export const schoolCheckInput = z.record(z.string(), z.object({ ids: z.array(z.string().max(40)).max(30), text: z.string().trim().max(600).default("") })).superRefine((answers, ctx) => {
+  for (const [section, a] of Object.entries(answers)) {
+    if (!CHECK_SECTION_IDS.includes(section)) { ctx.addIssue({ code: "custom", message: "unknown_section", path: [section] }); continue; }
+    if (section === EXTRA) { if (a.ids.length) ctx.addIssue({ code: "custom", message: "note_text_only", path: [section] }); continue; }
+    const ok = validOptionIds(section);
+    if (a.ids.some((id) => !ok.has(id))) ctx.addIssue({ code: "custom", message: "unknown_option", path: [section] });
+  }
+});
 
 /** Field name → message code map for forms (codes are translated by the UI). */
 export function fieldErrors(err: z.ZodError): Record<string, string> {

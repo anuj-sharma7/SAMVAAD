@@ -7,6 +7,7 @@ import { ConfirmButton } from "@/components/confirm";
 import { SyncBadge } from "@/components/field/sync-badge";
 import { CommitmentForm } from "@/components/field/visit/commitment-form";
 import { ObservationForm } from "@/components/field/visit/observation-form";
+import { FieldSchoolCheck } from "@/components/field/visit/school-check";
 import { describeFailure, dayOnly, FailureNotice, SavedSlot, SyncProblem, type Failure } from "@/components/field/visit/shared";
 import { useI18n } from "@/lib/i18n/client";
 import { useField, useLive } from "@/lib/offline/field-context";
@@ -24,10 +25,10 @@ export function VisitScreen({ visitId }: { visitId: string }) {
   const { data, loading } = useLive(async (s) => {
     const visit = await s.getVisit(visitId);
     if (!visit) return null;
-    const [schools, observations, commitments, open] = await Promise.all([
-      s.listSchools(), s.listObservations(visitId), s.listCommitments(visitId), s.openCommitmentsFor(visit.school_id, visit.teacher_alias),
+    const [schools, observations, commitments, open, check] = await Promise.all([
+      s.listSchools(), s.listObservations(visitId), s.listCommitments(visitId), s.openCommitmentsFor(visit.school_id, visit.teacher_alias), s.getSchoolCheck(visitId),
     ]);
-    return { visit, school: schools.find((x) => x.id === visit.school_id), observations, commitments, earlier: open.filter((c) => c.visit_id !== visit.id) };
+    return { visit, school: schools.find((x) => x.id === visit.school_id), observations, commitments, check, earlier: open.filter((c) => c.visit_id !== visit.id) };
   }, [visitId]);
 
   const [saved, setSaved] = useState<{ at: Date; where: Where } | null>(null);
@@ -45,7 +46,7 @@ export function VisitScreen({ visitId }: { visitId: string }) {
         action={<a href={hrefTo("/")} className={buttonClass("primary", "lg")}>{t("field.back")}</a>} />
     );
   }
-  const { visit, school, observations, commitments, earlier } = data;
+  const { visit, school, observations, commitments, check, earlier } = data;
   const commitment = commitments.find((c) => c.status !== "cancelled");
   const status = visit.status;
   const canObserve = status === "in_progress";
@@ -74,7 +75,7 @@ export function VisitScreen({ visitId }: { visitId: string }) {
   const transition = (to: "in_progress" | "pending_review") => guarded("visit", async () => { await store!.transitionVisit(visit.id, to); });
   const remove = (o: LocalObservation) => guarded("obs", async () => { await store!.deleteObservation(o.id); setConfirmDel(null); });
 
-  const syncedAll = visit.sync.state === "synced" && observations.every((o) => o.sync.state === "synced") && commitments.every((c) => c.sync.state === "synced");
+  const syncedAll = visit.sync.state === "synced" && observations.every((o) => o.sync.state === "synced") && commitments.every((c) => c.sync.state === "synced") && (!check || check.sync.state === "synced");
   const aiReady = reach === "online" && syncedAll;
   const aiReason = reach !== "online" ? t("field.ai.needsInternet") : visit.sync.state !== "synced" ? t("field.ai.needsSyncVisit") : t("field.ai.needsSyncRecords");
 
@@ -209,6 +210,8 @@ export function VisitScreen({ visitId }: { visitId: string }) {
           <FailureNotice failure={failFor("obs")} />
         </div>
       </Card>
+
+      {canEditObs && <FieldSchoolCheck visitId={visit.id} check={check} />}
 
       <Card>
         <CardHeader title={t("field.next.title")} description={t("field.next.desc")} />

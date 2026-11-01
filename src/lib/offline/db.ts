@@ -8,8 +8,8 @@ import { StorageError } from "./types";
  * Versioning: `MIGRATIONS` is append-only. Each step runs inside IndexedDB's upgrade transaction, so a step that throws rolls the
  * whole upgrade back and the database stays at its previous version with all records (including the outbox) intact.
  */
-export const DB_VERSION = 2;
-export const STORES = ["meta", "schools", "cards", "visits", "observations", "commitments", "outbox", "conflicts", "syncLog"] as const;
+export const DB_VERSION = 3;
+export const STORES = ["meta", "schools", "cards", "visits", "observations", "commitments", "schoolChecks", "outbox", "conflicts", "syncLog"] as const;
 
 export type Migration = { version: number; up: (db: IDBDatabase, tx: IDBTransaction) => void };
 
@@ -39,6 +39,13 @@ export const MIGRATIONS: Migration[] = [
     up(db, tx) {
       db.createObjectStore("syncLog", { keyPath: "id", autoIncrement: true });
       tx.objectStore("visits").createIndex("bySchool", "school_id");
+    },
+  },
+  {
+    // v3: the school check (one record per visit, keyed by the visit id). Existing records and the outbox are untouched.
+    version: 3,
+    up(db) {
+      db.createObjectStore("schoolChecks", { keyPath: "id" });
     },
   },
 ];

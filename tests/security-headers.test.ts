@@ -12,7 +12,10 @@ describe("security headers (proxy)", () => {
     expect(get(res, "x-frame-options")).toBe("DENY");
     expect(get(res, "referrer-policy")).toBe("strict-origin-when-cross-origin");
     expect(get(res, "permissions-policy")).toMatch(/camera=\(\)/);
-    expect(get(res, "permissions-policy")).toMatch(/microphone=\(\)/);
+    // Voice typing needs the microphone, for this origin only (the browser still asks each user). Everything else stays off.
+    expect(get(res, "permissions-policy")).toMatch(/microphone=\(self\)/);
+    expect(get(res, "permissions-policy")).not.toMatch(/microphone=\*/);
+    expect(get(res, "permissions-policy")).toMatch(/geolocation=\(\)/);
     expect(get(res, "cross-origin-opener-policy")).toBe("same-origin");
   });
 

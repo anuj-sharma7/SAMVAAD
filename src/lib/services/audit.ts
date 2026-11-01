@@ -11,6 +11,7 @@ export type AuditAction =
   | "observation.added"
   | "observation.updated"
   | "observation.deleted"
+  | "school_check.saved"
   | "observation_tag.suggested"
   | "observation_tag.confirmed"
   | "observation_tag.dismissed"

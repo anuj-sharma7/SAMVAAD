@@ -11,6 +11,13 @@ import { Field, Input, Select, Textarea } from "@/components/forms";
 import { fmtDate } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
 import { PURPOSES, SUBJECTS, purposeLabel, subjectLabel } from "@/lib/visit-labels";
+import { ChoiceQuestion, QuestionWizard } from "@/components/choice-question";
+import { VoiceButton, VoiceHint, appendSpoken } from "@/components/voice-input";
+import { FOCUS_OPTIONS, composeAnswer, emptyAnswer, type Answer } from "@/lib/guided";
+
+const GRADES = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+/** Up to this many schools are shown as big buttons; a longer list stays a dropdown. */
+const SCHOOL_BUTTONS_MAX = 8;
 
 interface Pending { id: string; school_id: string; teacher_alias: string; action_text: string; target_date: string; display_status: string }
 
@@ -31,6 +38,12 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
   const [subject, setSubject] = useState("Hindi");
   const [purpose, setPurpose] = useState<string>(PURPOSES[0]);
   const [ignorePrev, setIgnorePrev] = useState(false);
+  // Planning starts as one question at a time; the answers fill the same fields as the full form, which opens at the end for a check.
+  const [mode, setMode] = useState<"guided" | "form">("guided");
+  const [grade, setGrade] = useState("2");
+  const [focus, setFocus] = useState("");
+  const [focusAnswer, setFocusAnswer] = useState<Answer>(emptyAnswer());
+  const [prep, setPrep] = useState("");
   useUnsavedWarning(alias.trim().length > 0 && !busy); // in-memory only; the browser asks before the page is closed
   const submitKey = useRef(newKey()); // one key per form: a double-click or retry cannot create two visits
 
@@ -56,12 +69,88 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
     if (v) router.push(`/visits/${v.id}`);
   }
 
+  const single = (id: string, set: (v: string) => void) => (a: Answer) => set(a.ids[0] ?? "");
+  const one = (v: string): Answer => ({ ids: v ? [v] : [], text: "" });
+
+  if (mode === "guided") {
+    const focusLabels = Object.fromEntries(FOCUS_OPTIONS.map((o) => [o, t(`visits.q.focus.o.${o}`)]));
+    return (
+      <Card className="p-5" data-testid="guided-visit">
+        <QuestionWizard
+          header={(
+            <div className="space-y-2">
+              <h2 className="text-[15px] font-semibold">{t("visits.guided.title")}</h2>
+              <p className="text-sm text-ink-700">{t("visits.guided.intro")}</p>
+              <VoiceHint />
+              <button type="button" className="min-h-11 text-sm font-medium text-ink-700 underline" onClick={() => setMode("form")}>{t("visits.guided.direct")}</button>
+            </div>
+          )}
+          steps={[
+            {
+              key: "school", required: true, canNext: !!schoolId,
+              node: schools.length <= SCHOOL_BUTTONS_MAX ? (
+                <ChoiceQuestion name="vq-school" title={t("visits.q.school.title")} multiple={false} textMode="none"
+                  options={schools.map((s) => ({ id: s.id, label: `${s.name} (${s.code})` }))}
+                  value={one(schoolId)} onChange={(a) => { setSchoolId(a.ids[0] ?? ""); setIgnorePrev(false); }} />
+              ) : (
+                <div className="space-y-3">
+                  <label htmlFor="vq-school-select" className="block text-lg font-semibold text-ink-900">{t("visits.q.school.title")}</label>
+                  <Select id="vq-school-select" className="h-12 text-base" value={schoolId} onChange={(e) => { setSchoolId(e.target.value); setIgnorePrev(false); }}>
+                    <option value="">{t("visits.new.selectSchool")}</option>
+                    {schools.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
+                  </Select>
+                </div>
+              ),
+            },
+            {
+              key: "alias", required: true, canNext: alias.trim().length > 0,
+              node: (
+                <div className="space-y-3">
+                  <label htmlFor="vq-alias" className="block text-lg font-semibold text-ink-900">{t("visits.q.alias.title")}</label>
+                  <Input id="vq-alias" className="h-12 text-base" value={alias} onChange={(e) => { setAlias(e.target.value); setIgnorePrev(false); }} placeholder="T-101" maxLength={60} aria-describedby="vq-alias-hint" />
+                  <p id="vq-alias-hint" className="text-sm text-ink-600">{t("visits.new.aliasHint")}</p>
+                </div>
+              ),
+            },
+            {
+              key: "grade", required: true, canNext: true,
+              node: <ChoiceQuestion name="vq-grade" title={t("visits.q.grade.title")} multiple={false} textMode="none"
+                options={GRADES.map((g) => ({ id: String(g), label: t("visits.grade", { grade: g }) }))} value={one(grade)} onChange={single("grade", (v) => setGrade(v || "2"))} />,
+            },
+            {
+              key: "subject", required: true, canNext: true,
+              node: <ChoiceQuestion name="vq-subject" title={t("visits.q.subject.title")} multiple={false} textMode="none"
+                options={SUBJECTS.map((s) => ({ id: s, label: subjectLabel(t, s) }))} value={one(subject)}
+                onChange={single("subject", (v) => { setSubject(v || "Hindi"); if (v === "Hindi") setLanguage("hi"); })} />,
+            },
+            {
+              key: "purpose", required: true, canNext: true,
+              node: <ChoiceQuestion name="vq-purpose" title={t("visits.q.purpose.title")} multiple={false} textMode="none"
+                options={PURPOSES.map((p) => ({ id: p, label: purposeLabel(t, p) }))} value={one(purpose)} onChange={single("purpose", (v) => setPurpose(v || PURPOSES[0]))} />,
+            },
+            {
+              key: "focus", required: false, canNext: true,
+              node: <ChoiceQuestion name="vq-focus" title={t("visits.q.focus.title")} hint={t("visits.q.focus.hint")} multiple={false} textMode="other" textLabel={t("visits.q.focus.text")}
+                options={FOCUS_OPTIONS.map((o) => ({ id: o, label: focusLabels[o] }))} value={focusAnswer} onChange={setFocusAnswer} />,
+            },
+          ]}
+          finishLabel={t("visits.guided.finish")}
+          onFinish={() => { setFocus(composeAnswer(FOCUS_OPTIONS, focusLabels, focusAnswer).slice(0, 300)); setMode("form"); }}
+        />
+      </Card>
+    );
+  }
+
   return (
     <form
       noValidate
       onSubmit={(e) => { e.preventDefault(); void submit("planned", e.currentTarget); }}
       className="space-y-5"
     >
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-teal-50 px-3 py-2 text-sm text-teal-700">
+        <span>{t("visits.guided.reviewNote")}</span>
+        <button type="button" className="min-h-11 font-medium underline" onClick={() => setMode("guided")}>{t("visits.guided.useQuestions")}</button>
+      </div>
       <Card className="space-y-5 p-5">
         <h2 className="text-[15px] font-semibold">{t("visits.new.sectionWhere")}</h2>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -79,7 +168,7 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label={t("visits.new.grade")} htmlFor="grade" required error={f.grade}>
-              <Select id="grade" name="grade" defaultValue="2" error={f.grade}>{[1, 2, 3, 4, 5, 6, 7, 8].map((g) => <option key={g} value={g}>{t("visits.grade", { grade: g })}</option>)}</Select>
+              <Select id="grade" name="grade" value={grade} onChange={(e) => setGrade(e.target.value)} error={f.grade}>{GRADES.map((g) => <option key={g} value={g}>{t("visits.grade", { grade: g })}</option>)}</Select>
             </Field>
             <Field label={t("visits.new.subject")} htmlFor="subject" required error={f.subject}>
               <Select id="subject" value={subject} onChange={(e) => { setSubject(e.target.value); if (e.target.value === "Hindi") setLanguage("hi"); }} error={f.subject}>{SUBJECTS.map((s) => <option key={s} value={s}>{subjectLabel(t, s)}</option>)}</Select>
@@ -103,7 +192,8 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
           <Select id="purpose" value={purpose} onChange={(e) => setPurpose(e.target.value)} error={f.purpose}>{PURPOSES.map((p) => <option key={p} value={p}>{purposeLabel(t, p)}</option>)}</Select>
         </Field>
         <Field label={t("visits.new.focus")} htmlFor="coaching_focus" hint={t("visits.new.focusHint")} error={f.coaching_focus}>
-          <Input id="coaching_focus" name="coaching_focus" maxLength={300} placeholder={t("visits.new.focusPlaceholder")} />
+          <Input id="coaching_focus" name="coaching_focus" value={focus} onChange={(e) => setFocus(e.target.value)} maxLength={300} placeholder={t("visits.new.focusPlaceholder")} />
+          <VoiceButton onText={(s) => setFocus((x) => appendSpoken(x, s).slice(0, 300))} />
         </Field>
 
         {prev ? (
@@ -123,7 +213,8 @@ export function VisitForm({ schools, pending, defaultSchool, defaultLanguage = "
         ) : null}
 
         <Field label={t("visits.new.prep")} htmlFor="prep_notes" error={f.prep_notes}>
-          <Textarea id="prep_notes" name="prep_notes" maxLength={1000} placeholder={t("visits.new.prepPlaceholder")} />
+          <Textarea id="prep_notes" name="prep_notes" value={prep} onChange={(e) => setPrep(e.target.value)} maxLength={1000} placeholder={t("visits.new.prepPlaceholder")} />
+          <VoiceButton onText={(s) => setPrep((x) => appendSpoken(x, s).slice(0, 1000))} />
         </Field>
       </Card>
 

@@ -1,10 +1,10 @@
 import { dbNameFor, deleteDb, MIGRATIONS, openDb, type Migration } from "./db";
 import { inTx, uuid, wrap } from "./idb";
 import {
-  commitmentInput, observationInput, visitInput, type CommitmentInput, type ObservationInput, type VisitInput,
+  commitmentInput, observationInput, schoolCheckInput, visitInput, type CommitmentInput, type ObservationInput, type VisitInput,
 } from "./validation";
 import type {
-  ConflictRecord, EntityType, LocalCard, LocalCommitment, LocalObservation, LocalSchool, LocalVisit, OpKind, OutboxOp,
+  ConflictRecord, EntityType, LocalCard, LocalCommitment, LocalObservation, LocalSchool, LocalSchoolCheck, LocalVisit, OpKind, OutboxOp,
   Snapshot, SyncLogEntry, SyncMeta, SyncState, VisitStatus,
 } from "./types";
 import { StorageError } from "./types";
@@ -29,16 +29,17 @@ export class LocalRuleError extends Error {
 }
 
 const LOG_LIMIT = 200;
-type AnyEntity = LocalVisit | LocalObservation | LocalCommitment;
+type AnyEntity = LocalVisit | LocalObservation | LocalCommitment | LocalSchoolCheck;
 /** Fields a local record may hold. A server row can carry more (ids of other people, internal columns); those never reach the device. */
 const ALLOWED: Record<EntityType, string[]> = {
   visit: ["id", "school_id", "teacher_alias", "scheduled_at", "grade", "subject", "language", "purpose", "coaching_focus", "prep_notes", "previous_commitment_id", "observation_method", "status", "created_at", "updated_at"],
   observation: ["id", "visit_id", "practice_observed", "evidence", "worked_well", "improvement_area", "context_note", "created_at", "updated_at"],
   commitment: ["id", "visit_id", "action_text", "owner_role", "owner_alias", "target_date", "expected_evidence", "status", "created_at", "updated_at"],
+  school_check: ["id", "visit_id", "answers", "created_at", "updated_at"],
 };
 const pick = (type: EntityType, rec: Record<string, unknown>) => Object.fromEntries(Object.entries(rec).filter(([k]) => ALLOWED[type].includes(k)));
 
-const STORE_OF = { visit: "visits", observation: "observations", commitment: "commitments" } as const;
+const STORE_OF = { visit: "visits", observation: "observations", commitment: "commitments", school_check: "schoolChecks" } as const;
 
 /**
  * The on-device database for ONE account. Every write that must reach the server is saved TOGETHER with its outbox entry in a
@@ -101,6 +102,10 @@ export class LocalStore {
   async listObservations(visitId: string): Promise<LocalObservation[]> {
     const rows = await inTx(this.db, ["observations"], "readonly", (tx) => wrap(tx.objectStore("observations").index("byVisit").getAll(visitId) as IDBRequest<LocalObservation[]>));
     return rows.filter((o) => !o.deleted).sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+  /** The visit's school check (its record id is the visit id), or undefined when none was saved. */
+  async getSchoolCheck(visitId: string): Promise<LocalSchoolCheck | undefined> {
+    return inTx(this.db, ["schoolChecks"], "readonly", (tx) => wrap(tx.objectStore("schoolChecks").get(visitId) as IDBRequest<LocalSchoolCheck | undefined>));
   }
   async listCommitments(visitId: string): Promise<LocalCommitment[]> {
     const rows = await inTx(this.db, ["commitments"], "readonly", (tx) => wrap(tx.objectStore("commitments").index("byVisit").getAll(visitId) as IDBRequest<LocalCommitment[]>));
@@ -294,6 +299,32 @@ export class LocalStore {
     this.emit();
   }
 
+  // ---- school check ---------------------------------------------------------------------------------------------------
+  /**
+   * Saves the whole check for a visit (it replaces the previous one). The server applies it as a full replace, with no version
+   * check: a visit belongs to one mentor, so there is no second editor to conflict with.
+   */
+  async saveSchoolCheck(visitId: string, input: unknown): Promise<LocalSchoolCheck> {
+    const answers = schoolCheckInput.parse(input);
+    const kept = Object.fromEntries(Object.entries(answers).filter(([, a]) => a.ids.length > 0 || a.text));
+    const saved = await inTx(this.db, ["visits", "schoolChecks", "outbox"], "readwrite", async (tx) => {
+      const visit = (await wrap(tx.objectStore("visits").get(visitId))) as LocalVisit | undefined;
+      if (!visit) throw new LocalRuleError("not_found", "That visit is not on this device.");
+      if (visit.status !== "in_progress" && visit.status !== "pending_review") {
+        throw new LocalRuleError("visit_not_observable", visit.status === "completed" ? "This visit is completed and read-only." : "Start the visit before recording the school check.");
+      }
+      const prev = (await wrap(tx.objectStore("schoolChecks").get(visitId))) as LocalSchoolCheck | undefined;
+      const rec: LocalSchoolCheck = {
+        id: visitId, visit_id: visitId, answers: kept, created_at: prev?.created_at ?? this.iso, origin: prev?.origin ?? "local", sync: this.meta(prev?.sync ?? null),
+      };
+      await this.queue(tx, { entityType: "school_check", entityId: visitId, op: "update", chain: visitId, payload: { visit_id: visitId, answers: kept } });
+      await wrap(tx.objectStore("schoolChecks").put(rec));
+      return rec;
+    });
+    this.emit();
+    return saved;
+  }
+
   // ---- commitments ----------------------------------------------------------------------------------------------------
   async saveCommitment(visitId: string, input: unknown, existingId?: string): Promise<LocalCommitment> {
     const d: CommitmentInput = commitmentInput.parse(input);
@@ -334,7 +365,7 @@ export class LocalStore {
    */
   async applySnapshot(snap: Snapshot): Promise<{ visits: number; observations: number; commitments: number }> {
     const counts = { visits: 0, observations: 0, commitments: 0 };
-    await inTx(this.db, ["meta", "schools", "cards", "visits", "observations", "commitments", "outbox"], "readwrite", async (tx) => {
+    await inTx(this.db, ["meta", "schools", "cards", "visits", "observations", "commitments", "schoolChecks", "outbox"], "readwrite", async (tx) => {
       const confirmed = (updated: string): SyncMeta => ({ state: "synced", localUpdatedAt: updated, serverVersion: updated, confirmedAt: snap.server_time });
       const busy = new Set(((await wrap(tx.objectStore("outbox").getAll())) as OutboxOp[]).map((o) => `${o.entityType}:${o.entityId}`));
 
@@ -369,6 +400,17 @@ export class LocalStore {
         const { updated_at, feedback_id: _f, review_visit_id: _r, review_outcome: _o, review_evidence: _e, review_barriers: _b, reviewed_at: _t, completed_at: _c, ...rest } = c as typeof c & Record<string, unknown>; // eslint-disable-line @typescript-eslint/no-unused-vars
         await wrap(tx.objectStore("commitments").put({ ...(rest as Omit<LocalCommitment, "sync" | "origin">), origin: "server", sync: confirmed(updated_at) } satisfies LocalCommitment));
         counts.commitments++;
+      }
+      const serverChecks = new Set((snap.school_checks ?? []).map((c) => c.id));
+      for (const c of snap.school_checks ?? []) {
+        if (busy.has(`school_check:${c.id}`)) continue;
+        const { updated_at, ...rest } = c;
+        await wrap(tx.objectStore("schoolChecks").put({ ...rest, origin: "server", sync: confirmed(updated_at) } satisfies LocalSchoolCheck));
+      }
+      for (const lc of (await wrap(tx.objectStore("schoolChecks").getAll())) as LocalSchoolCheck[]) {
+        if (lc.sync.state === "synced" && !serverChecks.has(lc.id) && visitIdsInSnapshot.has(lc.visit_id) && !busy.has(`school_check:${lc.id}`)) {
+          await wrap(tx.objectStore("schoolChecks").delete(lc.id));
+        }
       }
       await wrap(tx.objectStore("meta").put({ key: "lastPullAt", value: snap.server_time }));
       await wrap(tx.objectStore("meta").put({ key: "account", value: snap.account }));
@@ -446,7 +488,7 @@ export class LocalStore {
 
   /** Whole request failed (offline, timeout, server error): keep every operation, schedule bounded retries. */
   async markFailed(opIds: string[], code: string, nextAttemptAt: string | null): Promise<void> {
-    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "syncLog"], "readwrite", async (tx) => {
+    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "schoolChecks", "syncLog"], "readwrite", async (tx) => {
       const idx = tx.objectStore("outbox").index("byOpId");
       for (const id of opIds) {
         const o = (await wrap(idx.get(id))) as OutboxOp | undefined;
@@ -466,7 +508,7 @@ export class LocalStore {
     nextAttemptAt: (retry: number) => string,
   ): Promise<{ applied: number; duplicates: number; conflicts: number; rejected: number; skipped: number; failed: number }> {
     const tally = { applied: 0, duplicates: 0, conflicts: 0, rejected: 0, skipped: 0, failed: 0 };
-    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "conflicts", "syncLog"], "readwrite", async (tx) => {
+    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "schoolChecks", "conflicts", "syncLog"], "readwrite", async (tx) => {
       const byId = new Map(results.map((r) => [r.op_id, r]));
       for (const sentOp of sent) {
         const cur = (await wrap(tx.objectStore("outbox").index("byOpId").get(sentOp.opId))) as OutboxOp | undefined;
@@ -555,7 +597,7 @@ export class LocalStore {
    * "server": take the server's version. The other version stays in the conflict record (marked resolved), never silently lost.
    */
   async resolveConflict(conflictId: string, choice: "mine" | "server"): Promise<void> {
-    await inTx(this.db, ["conflicts", "outbox", "visits", "observations", "commitments", "syncLog"], "readwrite", async (tx) => {
+    await inTx(this.db, ["conflicts", "outbox", "visits", "observations", "commitments", "schoolChecks", "syncLog"], "readwrite", async (tx) => {
       const c = (await wrap(tx.objectStore("conflicts").get(conflictId))) as ConflictRecord | undefined;
       if (!c || c.resolvedAt) return;
       const store = STORE_OF[c.entityType];
@@ -583,7 +625,7 @@ export class LocalStore {
 
   /** Give a failed or rejected change a fresh attempt (new operation id, because the server remembers a rejected id). */
   async retryOp(opId: string): Promise<void> {
-    await inTx(this.db, ["outbox", "visits", "observations", "commitments"], "readwrite", async (tx) => {
+    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "schoolChecks"], "readwrite", async (tx) => {
       const o = (await wrap(tx.objectStore("outbox").index("byOpId").get(opId))) as OutboxOp | undefined;
       if (!o || o.status === "conflict" || o.status === "inflight") return;
       await wrap(tx.objectStore("outbox").put({ ...o, opId: o.status === "rejected" ? uuid() : o.opId, status: "queued", retryCount: 0, nextAttemptAt: null, errorCode: undefined, errorMessage: undefined }));
@@ -598,13 +640,15 @@ export class LocalStore {
    * Only ever called from an explicit user action.
    */
   async discardRejected(opId: string, serverCopy?: Record<string, unknown>): Promise<void> {
-    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "syncLog"], "readwrite", async (tx) => {
+    await inTx(this.db, ["outbox", "visits", "observations", "commitments", "schoolChecks", "syncLog"], "readwrite", async (tx) => {
       const outbox = tx.objectStore("outbox");
       const o = (await wrap(outbox.index("byOpId").get(opId))) as OutboxOp | undefined;
       if (!o || o.status !== "rejected") return;
       const store = STORE_OF[o.entityType];
       const all = ((await wrap(outbox.index("byEntity").getAll(o.entityId))) as OutboxOp[]).filter((x) => x.entityType === o.entityType);
-      const neverOnServer = all.some((x) => x.op === "create");
+      const cur = (await wrap(tx.objectStore(store).get(o.entityId))) as AnyEntity | undefined;
+      // a school check is always sent as an update, so "never reached the server" means it has no confirmed version yet
+      const neverOnServer = all.some((x) => x.op === "create") || (o.entityType === "school_check" && cur?.sync.serverVersion == null);
       if (neverOnServer) {
         // also drop everything queued for records that depend on this visit
         const chainOps = ((await wrap(outbox.getAll())) as OutboxOp[]).filter((x) => o.entityType === "visit" ? x.chain === o.entityId : x.entityId === o.entityId);
@@ -614,6 +658,7 @@ export class LocalStore {
             const rows = (await wrap(tx.objectStore(s).index("byVisit").getAll(o.entityId))) as { id: string }[];
             for (const r of rows) await wrap(tx.objectStore(s).delete(r.id));
           }
+          await wrap(tx.objectStore("schoolChecks").delete(o.entityId)); // keyed by the visit id
         }
         await wrap(tx.objectStore(store).delete(o.entityId));
       } else {

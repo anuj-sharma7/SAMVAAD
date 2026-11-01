@@ -35,7 +35,7 @@ export function LanguageSwitcher({ tone = "dark" }: { tone?: "dark" | "light" })
           disabled={busy !== null}
           onClick={() => void choose(l)}
           className={cn(
-            "min-h-9 min-w-9 rounded-md px-2.5 text-[13px] font-medium transition-colors",
+            "min-h-11 min-w-11 rounded-md px-3.5 text-base font-medium transition-colors",
             tone === "dark"
               ? l === locale ? "bg-white/20 text-white" : "text-ink-100/85 hover:bg-white/10"
               : l === locale ? "bg-ink-900 text-white" : "text-ink-700 hover:bg-ink-100",

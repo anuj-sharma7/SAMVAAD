@@ -11,6 +11,12 @@ const ORIGIN = "http://localhost:3200";
 fs.mkdirSync("e2e-screenshots", { recursive: true });
 
 async function signIn(ctx: BrowserContext, persona: string) {
+  // The app defaults to Hindi; these specs assert English copy. Contexts created outside the config (launchPersistentContext) do not get the
+  // config's pinned locale cookie, so pin it here. A far-future expiry lets it survive closing and reopening the persistent browser profile.
+  await ctx.addCookies([{ name: "samvaad_locale", value: "en", url: ORIGIN, expires: Math.floor(Date.now() / 1000) + 86_400 }]);
+  // Field mode's cached public shell is built without the cookie, so offline it falls back to the default (Hindi) unless the browser has a saved
+  // choice. Seed English only when nothing is saved yet, so a test that switches to Hindi keeps its choice across reloads.
+  await ctx.addInitScript(() => { try { if (!localStorage.getItem("samvaad.ui-lang")) localStorage.setItem("samvaad.ui-lang", "en"); } catch { /* ignore */ } });
   // Each helper call uses its own client address (the e2e server trusts X-Forwarded-For) so the per-client sign-in limit is not shared across tests.
   const r = await ctx.request.post(`${ORIGIN}/api/v1/session`, { data: { profile_id: persona }, headers: { "x-forwarded-for": `10.1.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}` } });
   expect(r.status()).toBe(200);

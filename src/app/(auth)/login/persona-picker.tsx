@@ -10,6 +10,13 @@ import { useI18n } from "@/lib/i18n/client";
 import { errorText } from "@/lib/i18n/errors";
 
 const ICON = { mentor: GraduationCap, supervisor: UserCog, diet_admin: Library } as const;
+/** Demo persona id -> i18n key stem. Unknown ids fall back to the stored English name/designation. */
+const PERSONA_KEY: Record<string, string> = {
+  "demo-mentor-asha": "login.persona.asha",
+  "demo-mentor-rakesh": "login.persona.rakesh",
+  "demo-supervisor-meena": "login.persona.meena",
+  "demo-curator-ishaan": "login.persona.ishaan",
+};
 
 export function PersonaPicker({ personas, next = "/dashboard" }: { next?: string; personas: { id: string; name: string; role: string; designation: string }[] }) {
   const router = useRouter();
@@ -44,9 +51,9 @@ export function PersonaPicker({ personas, next = "/dashboard" }: { next?: string
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink-50 text-ink-700"><Icon size={20} aria-hidden /></span>
               <span className="min-w-0 flex-1">
-                <span className="block font-semibold text-ink-900">{p.name}</span>
-                <span className="block text-[13px] text-ink-600">{t(roleKey(p.role))} · {p.designation}</span>
-                <span className="mt-1.5 block text-[13px] text-ink-600">{t(`login.blurb.${p.role}`)}</span>
+                <span className="block text-lg font-semibold text-ink-900">{PERSONA_KEY[p.id] ? t(`${PERSONA_KEY[p.id]}.name`) : p.name}</span>
+                <span className="block text-sm text-ink-600">{PERSONA_KEY[p.id] ? t(`${PERSONA_KEY[p.id]}.role`) : `${t(roleKey(p.role))} · ${p.designation}`}</span>
+                <span className="mt-1.5 block text-sm leading-relaxed text-ink-600">{t(`login.blurb.${p.role}`)}</span>
               </span>
               <ArrowRight size={18} className="mt-1 shrink-0 text-ink-500 transition group-hover:translate-x-0.5 group-hover:text-ink-900" aria-hidden />
             </button>

@@ -18,6 +18,7 @@ export interface RecordInfo { school?: string; teacher?: string; date?: string; 
 export function useRecordName() {
   const { t, locale } = useI18n();
   return (type: EntityType, info: RecordInfo | undefined): string => {
+    if (type === "school_check") return t("check.syncName");
     if (!info) return t("sync.name.unknown");
     if (type === "visit") {
       return t("sync.name.visit", { school: info.school ?? "—", teacher: info.teacher ?? "—", date: info.date ? fmtDate(info.date, locale) : "—" });

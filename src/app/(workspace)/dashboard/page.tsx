@@ -1,6 +1,6 @@
 import { subjectLabel } from "@/lib/visit-labels";
 import Link from "next/link";
-import { ArrowRight, CalendarClock, CalendarPlus, CircleAlert, ClipboardCheck, Clock3, FileCheck2, History, ListChecks, MessageSquareText } from "lucide-react";
+import { ArrowRight, CalendarClock, ChevronDown, CalendarPlus, CircleAlert, ClipboardCheck, Clock3, FileCheck2, History, ListChecks, MessageSquareText } from "lucide-react";
 import { db, requireActor } from "@/lib/server/context";
 import { getDashboard, PILOT_TARGETS, type AdminDashboard, type MentorDashboard, type SupervisorDashboard } from "@/lib/services/dashboard";
 import { auditKey, fmtDate, fmtDay, fmtNumber, fmtTime, relativeDaysT } from "@/lib/format";
@@ -37,13 +37,13 @@ export default async function DashboardPage() {
 function StatCard({ href, label, value, icon: Icon, tone = "neutral" }: { href: string; label: string; value: number; icon: typeof Clock3; tone?: "neutral" | "amber" | "red" | "teal" }) {
   const toneCls = { neutral: "text-ink-700 bg-ink-50", amber: "text-amber-800 bg-amber-50", red: "text-red-700 bg-red-50", teal: "text-teal-700 bg-teal-50" }[tone];
   return (
-    <Link href={href} className="group rounded-xl border border-line bg-card p-4 transition hover:border-ink-700 hover:shadow-sm">
-      <div className="flex items-center justify-between">
-        <span className={cn("flex h-8 w-8 items-center justify-center rounded-lg", toneCls)}><Icon size={17} aria-hidden /></span>
-        <ArrowRight size={15} className="text-ink-500 opacity-0 transition group-hover:opacity-100" aria-hidden />
+    <Link href={href} className="group flex flex-col justify-between rounded-xl border border-line bg-card p-3 transition hover:border-ink-700 hover:shadow-sm sm:p-4">
+      <div className="flex items-center gap-2.5">
+        <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", toneCls)}><Icon size={18} aria-hidden /></span>
+        <p className="text-2xl font-semibold leading-none tracking-tight text-ink-900 sm:text-[28px]">{value}</p>
+        <ArrowRight size={15} className="ml-auto hidden text-ink-500 opacity-0 transition group-hover:opacity-100 sm:block" aria-hidden />
       </div>
-      <p className="mt-3 text-[28px] font-semibold leading-none tracking-tight text-ink-900">{value}</p>
-      <p className="mt-1.5 text-[13px] text-ink-600">{label}</p>
+      <p className="mt-2 text-sm leading-snug text-ink-700">{label}</p>
     </Link>
   );
 }
@@ -86,7 +86,7 @@ function MentorView({ data, name, i }: { data: MentorDashboard; name: string; i:
                         <p className="text-sm font-semibold">{fmtDay(v.scheduled_at, locale).split(" ").slice(1).join(" ")}</p>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium">{v.school_name}</p>
+                        <p className="font-medium sm:truncate">{v.school_name}</p>
                         <p className="text-[13px] text-ink-600">{t("dashboard.agenda.line", { grade: v.grade, subject: subjectLabel(t, v.subject), teacher: v.teacher_alias, time: fmtTime(v.scheduled_at, locale) })}</p>
                       </div>
                       <VisitStatusChip status={v.status} />
@@ -102,11 +102,11 @@ function MentorView({ data, name, i }: { data: MentorDashboard; name: string; i:
             {data.followupQueue.length === 0 ? (
               <div className="p-5"><EmptyState title={t("dashboard.queue.emptyTitle")} description={t("dashboard.queue.emptyDescription")} /></div>
             ) : (
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-line max-sm:[&>li:nth-child(n+4)]:hidden">
                 {data.followupQueue.map((f) => (
                   <li key={f.id} className="flex items-start gap-3 px-5 py-3.5">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium"><span lang={/[ऀ-ॿ]/.test(f.action_text) ? "hi" : undefined}>{f.action_text}</span></p>
+                      <p className="line-clamp-2 text-sm font-medium sm:line-clamp-3"><span lang={/[ऀ-ॿ]/.test(f.action_text) ? "hi" : undefined}>{f.action_text}</span></p>
                       <p className="mt-0.5 text-[13px] text-ink-600">{t("dashboard.queue.line", { school: f.school_name, teacher: f.teacher_alias, date: fmtDate(f.target_date, locale), relative: relativeDaysT(f.target_date, i) })}</p>
                     </div>
                     <CommitmentChip status={f.display_status} />
@@ -116,20 +116,6 @@ function MentorView({ data, name, i }: { data: MentorDashboard; name: string; i:
             )}
           </Card>
 
-          <Card>
-            <CardHeader title={t("dashboard.workflow.title")} description={t("dashboard.workflow.description")} />
-            <dl className="grid grid-cols-2 gap-px bg-line sm:grid-cols-5">
-              {[
-                [t("dashboard.workflow.observed"), w.observed], [t("dashboard.workflow.feedbackApproved"), w.feedback_approved], [t("dashboard.workflow.demosApproved"), w.demos_approved],
-                [t("dashboard.workflow.commitmentsAgreed"), w.commitments_agreed], [t("dashboard.workflow.commitmentsReviewed"), w.commitments_reviewed],
-              ].map(([k, v]) => (
-                <div key={k as string} className="bg-card px-4 py-3.5">
-                  <dd className="text-2xl font-semibold tracking-tight">{fmtNumber(v as number, locale)}</dd>
-                  <dt className="text-[13px] text-ink-600">{k}</dt>
-                </div>
-              ))}
-            </dl>
-          </Card>
         </div>
 
         <div className="space-y-6">
@@ -155,27 +141,52 @@ function MentorView({ data, name, i }: { data: MentorDashboard; name: string; i:
             <p className="border-t border-line px-5 py-2.5 text-xs text-ink-600">{t("dashboard.priorities.footer")} <Link className="underline" href="/settings">{t("dashboard.priorities.seeRules")}</Link></p>
           </Card>
 
-          <Card>
-            <CardHeader title={t("dashboard.coverage.title")} description={t("dashboard.coverage.description")} />
-            <ul className="space-y-3 px-5 py-4">
-              {data.coverage.map((s) => {
-                const days = s.days_since;
-                const pct = days === null ? 100 : Math.min(100, (days / 90) * 100);
-                return (
-                  <li key={s.id}>
-                    <div className="flex justify-between text-[13px]">
-                      <Link href={`/schools/${s.id}`} className="truncate font-medium hover:underline">{s.name}</Link>
-                      <span className="shrink-0 text-ink-600">{days === null ? t("dashboard.coverage.never") : t("dashboard.coverage.days", { n: fmtNumber(days, locale) })}</span>
-                    </div>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-100" role="img" aria-label={days === null ? t("dashboard.coverage.neverAria") : tp("dashboard.coverage.daysAria", days)}>
-                      <div className={cn("h-full rounded-full", pct >= 50 ? "bg-amber-600" : "bg-teal-600")} style={{ width: `${pct}%` }} />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
+        </div>
+      </div>
 
+      {/* Secondary detail is one tap away instead of pushing the work list down the page. Native <details>: no JS, keyboard and screen-reader friendly. */}
+      <details className="group mt-6 rounded-xl border border-line bg-card">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-base font-semibold text-ink-900 [&::-webkit-details-marker]:hidden">
+          {t("dashboard.more.title")}
+          <ChevronDown size={20} className="shrink-0 text-ink-600 transition group-open:rotate-180" aria-hidden />
+        </summary>
+        <div className="grid gap-6 border-t border-line p-4 grid-cols-[minmax(0,1fr)] lg:grid-cols-2">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader title={t("dashboard.workflow.title")} description={t("dashboard.workflow.description")} />
+              <dl className="grid grid-cols-2 gap-px bg-line sm:grid-cols-5">
+                {[
+                  [t("dashboard.workflow.observed"), w.observed], [t("dashboard.workflow.feedbackApproved"), w.feedback_approved], [t("dashboard.workflow.demosApproved"), w.demos_approved],
+                  [t("dashboard.workflow.commitmentsAgreed"), w.commitments_agreed], [t("dashboard.workflow.commitmentsReviewed"), w.commitments_reviewed],
+                ].map(([k, v]) => (
+                  <div key={k as string} className="bg-card px-4 py-3.5">
+                    <dd className="text-2xl font-semibold tracking-tight">{fmtNumber(v as number, locale)}</dd>
+                    <dt className="text-sm text-ink-600">{k}</dt>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+            <Card>
+              <CardHeader title={t("dashboard.coverage.title")} description={t("dashboard.coverage.description")} />
+              <ul className="space-y-3 px-5 py-4">
+                {data.coverage.map((s) => {
+                  const days = s.days_since;
+                  const pct = days === null ? 100 : Math.min(100, (days / 90) * 100);
+                  return (
+                    <li key={s.id}>
+                      <div className="flex justify-between gap-3 text-sm">
+                        <Link href={`/schools/${s.id}`} className="truncate font-medium hover:underline">{s.name}</Link>
+                        <span className="shrink-0 text-ink-600">{days === null ? t("dashboard.coverage.never") : t("dashboard.coverage.days", { n: fmtNumber(days, locale) })}</span>
+                      </div>
+                      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-100" role="img" aria-label={days === null ? t("dashboard.coverage.neverAria") : tp("dashboard.coverage.daysAria", days)}>
+                        <div className={cn("h-full rounded-full", pct >= 50 ? "bg-amber-600" : "bg-teal-600")} style={{ width: `${pct}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          </div>
           <Card>
             <CardHeader title={t("dashboard.activity.title")} description={t("dashboard.activity.description")} action={<History size={16} className="text-ink-500" aria-hidden />} />
             {data.activity.length === 0 ? (
@@ -183,7 +194,7 @@ function MentorView({ data, name, i }: { data: MentorDashboard; name: string; i:
             ) : (
               <ol className="relative space-y-3 px-5 py-4 before:absolute before:bottom-5 before:left-[25px] before:top-5 before:w-px before:bg-line">
                 {data.activity.map((a, k) => (
-                  <li key={k} className="relative flex gap-3 text-[13px]">
+                  <li key={k} className="relative flex gap-3 text-sm">
                     <span className="relative z-10 mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 border-ink-500 bg-card" aria-hidden />
                     <div>
                       <p className="font-medium">{t(auditKey(a.action))}</p>
@@ -195,7 +206,7 @@ function MentorView({ data, name, i }: { data: MentorDashboard; name: string; i:
             )}
           </Card>
         </div>
-      </div>
+      </details>
 
       <PublicTeaser i={i} />
       <TargetsCard i={i} />

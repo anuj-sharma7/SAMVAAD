@@ -45,7 +45,8 @@ test("mentor completes the whole coaching cycle: visit → observation → groun
   await expect(page.getByText("Open coaching commitments")).toBeVisible();
   await page.getByRole("link", { name: /New visit here/ }).click();
 
-  // 3 · plan: the earlier commitment surfaces automatically
+  // 3 · plan: the earlier commitment surfaces automatically (the guided questions have their own spec; here we use the full form)
+  await page.getByRole("button", { name: "Fill the full form instead" }).click();
   await page.getByLabel("Teacher alias").fill("T-101");
   await expect(page.getByText("Follow up on the previous commitment")).toBeVisible();
   await expect(page.getByText("Overdue").first()).toBeVisible();
@@ -72,6 +73,7 @@ test("mentor completes the whole coaching cycle: visit → observation → groun
 
   // 5 · observe: structured observation, suggested tag needs confirmation
   await page.getByRole("link", { name: "Observe", exact: true }).first().click();
+  await page.getByRole("button", { name: "Write it myself instead" }).click();
   await page.getByLabel("What practice did you observe?").fill("Learners read the story aloud in pairs, taking turns.");
   await page.getByLabel(/^Evidence/).fill("Few questions checked whether learners understood the story.");
   await page.getByLabel("What worked well").fill("Learners read the story aloud in pairs and stayed engaged.");
@@ -186,6 +188,7 @@ test("unsafe or unauthorised requests are handled safely", async ({ page, reques
 
 test("mobile layout: navigation drawer works without horizontal overflow", async ({ browser }) => {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 800 } });
+  await ctx.addCookies([{ name: "samvaad_locale", value: "en", url: "http://localhost:3200" }]); // English copy is asserted below; the app defaults to Hindi
   const page = await ctx.newPage();
   await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
   await page.goto(`/login`);
@@ -269,6 +272,7 @@ test("knowledge base: curator approves official excerpts, then the mentor's feed
   await page.getByRole("link", { name: /\d{1,2} \w{3} \d{4}/ }).first().click();
   await page.getByRole("button", { name: "Start visit" }).click();
   await expect(page).toHaveURL(/\/observe$/);
+  await page.getByRole("button", { name: "Write it myself instead" }).click();
   await page.getByLabel("What practice did you observe?").fill("Learners read the story aloud in pairs.");
   await page.getByLabel(/^Evidence/).fill("Few questions checked whether learners understood the story.");
   await page.getByLabel("One area to grow").fill("Few questions were asked about the meaning of the story after reading.");

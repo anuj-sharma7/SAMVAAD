@@ -4,6 +4,7 @@ const m = {
   "dashboard.mentor.intro_one": "You are working across {n} assigned schools. Here is what needs your attention first.",
   "dashboard.mentor.intro_other": "You are working across {n} assigned schools. Here is what needs your attention first.",
   "dashboard.planVisit": "Plan a visit",
+  "dashboard.more.title": "Progress, coverage and activity",
   "dashboard.stat.visitsPlanned": "Visits planned",
   "dashboard.stat.inProgress": "In progress / pending review",
   "dashboard.stat.feedbackAwaiting": "Feedback awaiting your approval",
