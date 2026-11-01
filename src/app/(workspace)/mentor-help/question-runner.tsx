@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Lightbulb, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Copy, Lightbulb, Loader2, Sparkles, Wand2 } from "lucide-react";
 import { api, ApiError } from "@/lib/client/api";
 import { useI18n } from "@/lib/i18n/client";
 import { useToast } from "@/components/toast";
@@ -9,6 +9,7 @@ import { Button, Card, CardHeader, Chip, Notice, cn } from "@/components/ui";
 import { Field, Select, Textarea } from "@/components/forms";
 import { SimulatedBadge } from "@/components/ui-i18n";
 import { GROUND_TOPICS, HELP_GRADES, MEAL_TOPICS, subjectsForGrade, type HelpSubject, type Outcome } from "@/lib/help/catalog";
+import { questionSetText } from "@/lib/help/share-text";
 import type { HelpSession } from "@/lib/services/mentor-help";
 
 export interface RecentSet { id: string; kind: string; grade: number | null; subject: string | null; topic: string | null; reviewed: boolean; created_at: string }
@@ -67,6 +68,15 @@ export function QuestionRunner({ mode, initial, recent, defaults, keepQuery = ""
     } finally {
       setBusy(null);
     }
+  }
+
+  /** Puts the questions on the clipboard as plain text, to paste into WhatsApp or a notes app. */
+  async function copyText() {
+    if (!session) return;
+    const title = session.kind === "subject" ? `${t("mhelp.classN", { n: session.grade ?? 0 })} · ${t(`mhelp.subject.${session.subject}`)}` : t(`mhelp.meal.t.${session.topic}`);
+    const who = Object.fromEntries(["students", "cook", "teacher", "head", "smc"].map((w) => [w, t(`mhelp.q.who.${w}`)]));
+    const text = questionSetText(title, session.tip, session.questions, { who, hint: t("mhelp.q.hint"), tip: t("mhelp.q.tip") });
+    try { await navigator.clipboard.writeText(text); toast.success(t("mhelp.q.copied")); } catch { toast.error(t("mhelp.q.copyFailed")); }
   }
 
   const labelOf = (r: RecentSet) =>
@@ -149,6 +159,10 @@ export function QuestionRunner({ mode, initial, recent, defaults, keepQuery = ""
             </div>
             {session.is_simulated && <Notice tone="warning">{t("mhelp.simNote")}</Notice>}
             {session.tip && <p className="flex items-start gap-2 text-sm text-ink-700"><Lightbulb size={16} className="mt-0.5 shrink-0 text-amber-700" aria-hidden /> <span><strong>{t("mhelp.q.tip")}:</strong> {session.tip}</span></p>}
+
+            <div className="no-print flex flex-wrap gap-2">
+              <Button type="button" variant="secondary" size="sm" onClick={() => void copyText()}><Copy size={14} aria-hidden /> {t("mhelp.q.copy")}</Button>
+            </div>
 
             <ol className="space-y-3">
               {session.questions.map((q, idx) => {
