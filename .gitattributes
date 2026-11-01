@@ -1,0 +1,7 @@
+# Let git normalise line endings for text files, and never touch binaries.
+* text=auto
+*.png binary
+*.jpg binary
+*.pptx binary
+*.apk binary
+*.pdf binary
