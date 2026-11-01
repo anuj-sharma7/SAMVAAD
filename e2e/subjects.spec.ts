@@ -56,6 +56,10 @@ test("tap several subjects: the first is the main subject, the rest are also cov
   const visit = (saved.data ?? saved).visit ?? (saved.data ?? saved);
   expect(visit.subject).toBe("Mathematics");
   expect(JSON.parse(visit.extra_subjects)).toEqual(["Science", "English"]);
+  // the visit page names every chosen subject, and so does the visits list
+  await expect(page.getByText("Grade 4 · Mathematics, Science, English")).toBeVisible();
+  await page.goto("/visits");
+  await expect(page.getByText("Grade 4 · Mathematics, Science, English").first()).toBeVisible();
 });
 
 test("'All subjects' and 'Survey all subjects' cover every subject", async ({ page }) => {
@@ -87,4 +91,5 @@ test("'All subjects' and 'Survey all subjects' cover every subject", async ({ pa
   const saved = await (await page.request.get(`/api/v1/visits/${id}`)).json();
   const visit = (saved.data ?? saved).visit ?? (saved.data ?? saved);
   expect(JSON.parse(visit.extra_subjects)).toHaveLength(6);
+  await expect(page.getByText("Grade 4 · All subjects")).toBeVisible();
 });
