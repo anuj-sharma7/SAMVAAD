@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lightbulb, Loader2, RefreshCw } from "lucide-react";
+import { Camera, Lightbulb, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { api, ApiError } from "@/lib/client/api";
+import { shrinkImage } from "@/lib/client/shrink-image";
 import { useI18n } from "@/lib/i18n/client";
 import { useToast } from "@/components/toast";
 import { Button, Card, CardHeader, Chip, Notice, cn } from "@/components/ui";
@@ -12,19 +13,51 @@ import { SimulatedBadge } from "@/components/ui-i18n";
 import { HELP_GRADES, HELP_SUBJECTS, ISSUE_CATEGORIES, ISSUE_STATUSES, type IssueStatus } from "@/lib/help/catalog";
 import type { AcademicIssue, IssueSummary } from "@/lib/services/mentor-help";
 
+const MAX_PHOTOS = 3;
 const STATUS_TONE: Record<IssueStatus, "amber" | "teal" | "neutral"> = { open: "amber", in_progress: "neutral", resolved: "teal" };
 
-export function AcademicPanel({ items, summary, schools, filter }: { items: AcademicIssue[]; summary: IssueSummary; schools: { id: string; name: string }[]; filter: string }) {
+export function AcademicPanel({ items, summary, schools, filter, defaults }: { items: AcademicIssue[]; summary: IssueSummary; schools: { id: string; name: string }[]; filter: string; defaults?: { school?: string; grade?: number; subject?: string } }) {
   const { t, locale } = useI18n();
   const toast = useToast();
   const router = useRouter();
   const [category, setCategory] = useState<string>("reading");
-  const [school, setSchool] = useState("");
-  const [grade, setGrade] = useState("");
-  const [subject, setSubject] = useState("");
+  const [school, setSchool] = useState(defaults?.school && schools.some((s) => s.id === defaults.school) ? defaults.school : "");
+  const [grade, setGrade] = useState(defaults?.grade ? String(defaults.grade) : "");
+  const [subject, setSubject] = useState(defaults?.subject ?? "");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
+  const newPhotoInput = useRef<HTMLInputElement>(null);
+
+  /** Shrinks and uploads one photo. Returns an error message instead of throwing, so a failed photo never loses the problem. */
+  async function uploadPhoto(issueId: string, file: File): Promise<string | null> {
+    try {
+      const data_base64 = await shrinkImage(file);
+      await api("POST", `/help/issues/${issueId}/photos`, { data_base64 });
+      return null;
+    } catch (e) {
+      if (e instanceof ApiError) return e.message;
+      return t("mhelp.academic.photoUnreadable");
+    }
+  }
+
+  async function addPhoto(issueId: string, file: File) {
+    setBusy(issueId);
+    const err = await uploadPhoto(issueId, file);
+    setBusy(null);
+    if (err) toast.error(t("mhelp.academic.photoFailed", { message: err }));
+    else { toast.success(t("mhelp.academic.photoAdded")); router.refresh(); }
+  }
+
+  async function removePhoto(photoId: string) {
+    try {
+      await api("DELETE", `/help/photos/${photoId}`);
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : String(e));
+    }
+  }
 
   async function create() {
     setBusy("new");
@@ -34,7 +67,14 @@ export function AcademicPanel({ items, summary, schools, filter }: { items: Acad
         category, description: text, school_id: school || null, grade: grade ? Number(grade) : null, subject: subject || null,
       });
       setText("");
-      if (r.suggestion_error) toast.error(t("mhelp.academic.suggestionFailed", { message: r.suggestion_error }));
+      let photoError: string | null = null;
+      if (photo) {
+        photoError = await uploadPhoto(r.id, photo);
+        setPhoto(null);
+        if (newPhotoInput.current) newPhotoInput.current.value = "";
+      }
+      if (photoError) toast.error(t("mhelp.academic.photoFailed", { message: photoError }));
+      else if (r.suggestion_error) toast.error(t("mhelp.academic.suggestionFailed", { message: r.suggestion_error }));
       else toast.success(t("mhelp.academic.saved"));
       router.refresh();
     } catch (e) {
@@ -104,6 +144,22 @@ export function AcademicPanel({ items, summary, schools, filter }: { items: Acad
             <Field label={t("mhelp.academic.what")} hint={t("mhelp.academic.whatHint")} htmlFor="ai-text" required>
               <Textarea id="ai-text" value={text} maxLength={800} onChange={(e) => setText(e.target.value)} required minLength={3} />
             </Field>
+            <div className="space-y-1.5">
+              <p className="text-sm font-medium text-ink-900">{t("mhelp.academic.photo")}</p>
+              <input ref={newPhotoInput} id="ai-photo" type="file" accept="image/*" className="sr-only" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
+              <div className="flex flex-wrap items-center gap-2">
+                <label htmlFor="ai-photo" className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-line-strong bg-card px-3.5 text-sm font-medium hover:bg-ink-50 focus-within:outline focus-within:outline-2 focus-within:outline-teal-600">
+                  <Camera size={16} aria-hidden /> {photo ? t("mhelp.academic.photoChange") : t("mhelp.academic.photoAdd")}
+                </label>
+                {photo && (
+                  <span className="inline-flex items-center gap-1.5 text-[13px] text-ink-600">
+                    <span className="max-w-[160px] truncate">{photo.name}</span>
+                    <button type="button" className="rounded p-1 text-ink-600 hover:bg-ink-100" aria-label={t("mhelp.academic.photoRemove")} onClick={() => { setPhoto(null); if (newPhotoInput.current) newPhotoInput.current.value = ""; }}><Trash2 size={14} aria-hidden /></button>
+                  </span>
+                )}
+              </div>
+              <p className="text-[13px] text-ink-600">{t("mhelp.academic.photoHint")}</p>
+            </div>
             {error && <Notice tone="error">{error}</Notice>}
             <Button type="submit" variant="accent" className="w-full" disabled={busy !== null || text.trim().length < 3}>
               {busy === "new" ? <><Loader2 size={16} className="animate-spin" aria-hidden /> {t("mhelp.academic.saving")}</> : t("mhelp.academic.submit")}
@@ -162,6 +218,26 @@ export function AcademicPanel({ items, summary, schools, filter }: { items: Acad
                   </div>
                   {i.school_name && <p className="text-[13px] font-medium text-ink-600">{i.school_name}</p>}
                   <p lang="hi" className="whitespace-pre-wrap">{i.description}</p>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    {i.photos.map((ph, k) => (
+                      <div key={ph.id} className="relative">
+                        <a href={`/api/v1/help/photos/${ph.id}`} target="_blank" rel="noopener noreferrer">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={`/api/v1/help/photos/${ph.id}`} alt={t("mhelp.academic.photoAlt", { n: k + 1 })} loading="lazy" className="h-20 w-20 rounded-lg border border-line object-cover" />
+                        </a>
+                        <button type="button" aria-label={t("mhelp.academic.photoRemoveN", { n: k + 1 })} className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border border-line-strong bg-card text-ink-700 shadow hover:bg-red-50" onClick={() => void removePhoto(ph.id)}><Trash2 size={13} aria-hidden /></button>
+                      </div>
+                    ))}
+                    {i.photos.length < MAX_PHOTOS && (
+                      <>
+                        <input id={`ph-${i.id}`} type="file" accept="image/*" className="sr-only" disabled={busy === i.id} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void addPhoto(i.id, f); }} />
+                        <label htmlFor={`ph-${i.id}`} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-line-strong px-3.5 text-sm font-medium text-ink-700 hover:bg-ink-50 focus-within:outline focus-within:outline-2 focus-within:outline-teal-600">
+                          <Camera size={16} aria-hidden /> {t("mhelp.academic.photoAdd")}
+                        </label>
+                      </>
+                    )}
+                  </div>
 
                   <div className="rounded-lg bg-amber-50 px-3.5 py-3 text-sm text-ink-900">
                     <div className="mb-1.5 flex flex-wrap items-center gap-2">

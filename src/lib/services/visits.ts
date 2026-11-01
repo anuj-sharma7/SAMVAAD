@@ -7,7 +7,7 @@ import { audit } from "./audit";
 import { assertNotStale, getAuthorizedVisit, isActivelyAssigned } from "./access";
 import type { Actor, VisitRow, VisitStatus, SchoolRow } from "../types";
 
-export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS"] as const;
+export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS", "Science", "SocialScience", "Sanskrit"] as const;
 export const VISIT_PURPOSES = [
   "Routine academic support visit",
   "Follow-up on a previous coaching commitment",

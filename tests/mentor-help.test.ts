@@ -116,3 +116,35 @@ describe("question sets and review", () => {
     expect(i.suggestion?.first_step).toMatch(/[ऀ-ॿ]/);
   });
 });
+
+describe("photos on a problem", () => {
+  const jpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(40, 1)]).toString("base64");
+  const mk = async (db: ReturnType<typeof freshDb>) => (await createIssue(db, asha(db), { category: "reading", description: "Cannot read words", ...demo })).id;
+
+  it("adds, lists, reads and deletes photos, only for the owner", async () => {
+    const { addIssuePhoto, getIssuePhoto, deleteIssuePhoto } = await import("@/lib/services/mentor-help");
+    const db = freshDb();
+    const id = await mk(db);
+    const withOne = addIssuePhoto(db, asha(db), id, { data_base64: jpeg });
+    expect(withOne.photos).toHaveLength(1);
+    expect(getIssuePhoto(db, asha(db), withOne.photos[0].id).mime).toBe("image/jpeg");
+    expect(listIssues(db, asha(db)).items[0].photos).toHaveLength(1);
+    expect(() => getIssuePhoto(db, rakesh(db), withOne.photos[0].id)).toThrow(/not found/i);
+    expect(() => addIssuePhoto(db, rakesh(db), id, { data_base64: jpeg })).toThrow(/not found/i);
+    expect(() => deleteIssuePhoto(db, rakesh(db), withOne.photos[0].id)).toThrow(/not found/i);
+    expect(deleteIssuePhoto(db, asha(db), withOne.photos[0].id).photos).toHaveLength(0);
+  });
+
+  it("refuses files that are not images, too many photos, and oversize photos", async () => {
+    const { addIssuePhoto, MAX_PHOTO_BYTES } = await import("@/lib/services/mentor-help");
+    const db = freshDb();
+    const id = await mk(db);
+    expect(() => addIssuePhoto(db, asha(db), id, { data_base64: Buffer.from("<script>alert(1)</script>............").toString("base64") })).toThrow(/JPEG, PNG or WebP/);
+    expect(() => addIssuePhoto(db, asha(db), id, { data_base64: "not base64!!!!!!!!!!!!" })).toThrow();
+    for (let n = 0; n < 3; n++) addIssuePhoto(db, asha(db), id, { data_base64: jpeg });
+    expect(() => addIssuePhoto(db, asha(db), id, { data_base64: jpeg })).toThrow(/up to 3/);
+    const id2 = await mk(db);
+    const big = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff]), Buffer.alloc(MAX_PHOTO_BYTES + 10, 2)]).toString("base64");
+    expect(() => addIssuePhoto(db, asha(db), id2, { data_base64: big })).toThrow();
+  });
+});

@@ -13,6 +13,25 @@ export function subjectsForGrade(grade: number): HelpSubject[] {
   return HELP_SUBJECTS.filter((s) => grade >= 3 || (s !== "SocialScience" && s !== "Sanskrit"));
 }
 
+/** A visit's subject (which also has EVS) as a Mentor Help subject; falls back to Hindi when the class does not offer it. */
+export function helpSubjectFor(visitSubject: string, grade: number): HelpSubject {
+  const s = visitSubject === "EVS" ? "Science" : visitSubject;
+  const found = (HELP_SUBJECTS as readonly string[]).includes(s) ? (s as HelpSubject) : "Hindi";
+  return subjectsForGrade(grade).includes(found) ? found : "Hindi";
+}
+
+/** Prefill values from the URL (used when a mentor opens a helper from a visit). Anything invalid is ignored. */
+export function helpDefaultsFromQuery(sp: { grade?: string | string[]; subject?: string | string[]; school?: string | string[]; visit?: string | string[] }) {
+  const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
+  const g = Number(one(sp.grade));
+  const grade = (HELP_GRADES as readonly number[]).includes(g) ? g : undefined;
+  const subj = one(sp.subject);
+  const subject = subj && (HELP_SUBJECTS as readonly string[]).includes(subj) && (!grade || subjectsForGrade(grade).includes(subj as HelpSubject)) ? (subj as HelpSubject) : undefined;
+  const school = one(sp.school) && /^[A-Za-z0-9_-]{1,80}$/.test(one(sp.school)!) ? one(sp.school) : undefined;
+  const visit = one(sp.visit) && /^[A-Za-z0-9_-]{8,80}$/.test(one(sp.visit)!) ? one(sp.visit) : undefined;
+  return { grade, subject, school, visit };
+}
+
 export type Band = "1-2" | "3-5" | "6-8";
 export const bandOf = (grade: number): Band => (grade <= 2 ? "1-2" : grade <= 5 ? "3-5" : "6-8");
 

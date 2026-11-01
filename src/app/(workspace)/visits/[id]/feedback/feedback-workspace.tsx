@@ -8,6 +8,7 @@ import { useAction } from "@/lib/client/use-action";
 import { AiDraftBadge, Button, Card, CardHeader, Chip, FeedbackChip, LinkButton, Notice, OriginBadge, SimulatedBadge } from "@/components/ui";
 import { ConfirmButton } from "@/components/confirm";
 import { Field, Select, Textarea } from "@/components/forms";
+import { CoachPanel } from "./coach-panel";
 import { fmtDateTime } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -210,6 +211,9 @@ function FeedbackWorkspaceInner({ visit, observations, current, rejected, cards,
       </div>
 
       <div className="space-y-5">
+        {current.status !== "rejected" && current.status !== "insufficient_evidence" && (
+          <CoachPanel feedbackId={current.id} lang={feedbackLang} card={{ strength: f.strength, priority_practice: f.priority_practice, next_step: f.next_step, ask_question: f.ask_question, describe_statement: f.describe_statement, ask_again_question: f.ask_again_question }} />
+        )}
         <SourcesPanel citations={current.citations} selected={f.sources} editable={editable} cards={cards} onChange={(s) => setF({ ...f, sources: s })} />
         <EvidencePanel observations={observations} used={current.evidence} />
         <Card>

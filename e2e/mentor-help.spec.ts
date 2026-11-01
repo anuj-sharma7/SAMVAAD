@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import zlib from "node:zlib";
 
 // Mentor Help: academic problems with instant AI suggestion and status, class/subject questions with tap-to-answer and AI review,
 // and the mid-day meal / ground question sets. English copy (the config pins the English locale cookie).
@@ -70,6 +71,98 @@ test("mid-day meal and ground question sets work and meet accessibility checks",
   await page.getByLabel("What do you want to check?").selectOption("toilets");
   await page.getByRole("button", { name: "Make questions" }).click();
   await expect(page.getByText("Ask the children").first()).toBeVisible();
+  const a11y = await new AxeBuilder({ page }).analyze();
+  expect(a11y.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+});
+
+test("optional photo on a problem: add while logging and later, view, delete; limit of three", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
+  await signIn(page);
+  await page.goto("/mentor-help/academic");
+  const png = makePng();
+  await page.getByLabel(/What did you see/).fill("Wall chart is torn and children cannot see letters");
+  await page.locator("#ai-photo").setInputFiles({ name: "wall.png", mimeType: "image/png", buffer: png });
+  await expect(page.getByText("wall.png")).toBeVisible();
+  await page.getByRole("button", { name: "Save and get AI suggestion" }).click();
+  const card = page.getByRole("listitem").filter({ hasText: "Wall chart is torn" });
+  await expect(card.getByRole("img", { name: "Photo 1 of this problem" })).toBeVisible();
+  // the image really is served, as an image, only to the signed-in mentor
+  const src = await card.getByRole("img").first().getAttribute("src");
+  const ok = await page.request.get(src!);
+  expect(ok.status()).toBe(200);
+  expect(ok.headers()["content-type"]).toBe("image/jpeg");
+  const anon = await (await page.context().browser()!.newContext({ baseURL: "http://localhost:3200" })).request.get(src!);
+  expect(anon.status()).toBe(401);
+
+  // add two more, then the add button disappears
+  for (const n of [2, 3]) {
+    await card.locator('input[type="file"]').setInputFiles({ name: `p${n}.png`, mimeType: "image/png", buffer: png });
+    await expect(card.getByRole("img", { name: `Photo ${n} of this problem` })).toBeVisible();
+  }
+  await expect(card.getByText("Add photo")).toHaveCount(0);
+  await card.getByRole("button", { name: "Delete photo 3" }).click();
+  await expect(card.getByRole("img")).toHaveCount(2);
+
+  // a file that is not a picture is refused and the problem is kept
+  await card.locator('input[type="file"]').setInputFiles({ name: "x.png", mimeType: "image/png", buffer: Buffer.from("not really an image") });
+  await expect(page.getByText(/could not be read as a picture|photo was not/i).first()).toBeVisible();
+  const a11y = await new AxeBuilder({ page }).analyze();
+  expect(a11y.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+});
+
+/** A valid 16x16 red PNG built in memory (no fixture file needed). */
+function makePng(): Buffer {
+  const chunk = (type: string, data: Buffer) => {
+    const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const body = Buffer.concat([Buffer.from(type), data]);
+    const crc = Buffer.alloc(4); crc.writeUInt32BE(zlib.crc32(body));
+    return Buffer.concat([len, body, crc]);
+  };
+  const w = 16, h = 16;
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const row = Buffer.concat([Buffer.from([0]), Buffer.concat(Array.from({ length: w }, () => Buffer.from([200, 30, 30])))]);
+  const raw = Buffer.concat(Array.from({ length: h }, () => row));
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+}
+
+test("the Observe page offers the Mentor Help helpers with this visit's class, subject and school filled in", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("samvaad.tour.v1", "seen"));
+  await signIn(page);
+  const schools = await (await page.request.get("/api/v1/schools")).json();
+  const schoolId = (schools.data?.items ?? schools.items)[0].id;
+  const created = await page.request.post("/api/v1/visits", {
+    data: { school_id: schoolId, teacher_alias: "T-901", scheduled_at: new Date(Date.now() + 86_400_000).toISOString(), grade: 4, subject: "Mathematics", language: "en", purpose: "Routine academic support visit", save_as: "planned" },
+    headers: { "idempotency-key": crypto.randomUUID() },
+  });
+  expect([200, 201]).toContain(created.status());
+  const body = await created.json();
+  const visitId = (body.data ?? body).id;
+  await page.request.post(`/api/v1/visits/${visitId}/transition`, { data: { to: "in_progress" } });
+
+  await page.goto(`/visits/${visitId}/observe`);
+  const card = page.getByTestId("mentor-help-card");
+  await expect(card.getByRole("heading", { name: "AI helpers for this visit" })).toBeVisible();
+
+  // student questions: class 4 and Maths are already chosen, and there is a way back to the visit
+  await card.getByTestId("mh-questions").click();
+  await expect(page.getByLabel("Class", { exact: true })).toHaveValue("4");
+  await expect(page.getByLabel("Subject")).toHaveValue("Mathematics");
+  await expect(page.getByRole("link", { name: "Back to the visit" })).toBeVisible();
+  await page.getByRole("button", { name: "Make questions" }).click();
+  await expect(page.getByText("Ask the children").first()).toBeVisible();
+  await page.getByRole("link", { name: "Back to the visit" }).click();
+  await expect(page).toHaveURL(new RegExp(`/visits/${visitId}/observe`));
+
+  // academic problem: class, subject and the school come filled in
+  await page.getByTestId("mentor-help-card").getByTestId("mh-academic").click();
+  await expect(page.getByLabel("Class (optional)")).toHaveValue("4");
+  await expect(page.getByLabel("Subject (optional)")).toHaveValue("Mathematics");
+  await expect(page.getByLabel("School (optional)")).not.toHaveValue("");
+
+  // mid-day meal and ground
+  await page.goBack();
+  await page.getByTestId("mentor-help-card").getByTestId("mh-meal").click();
+  await expect(page.getByRole("heading", { name: "Mid-day meal and ground", level: 1 })).toBeVisible();
   const a11y = await new AxeBuilder({ page }).analyze();
   expect(a11y.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
 });

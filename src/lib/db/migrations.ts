@@ -574,4 +574,21 @@ CREATE TABLE help_sessions (
 CREATE INDEX idx_help_sessions_mentor ON help_sessions(mentor_id, kind, created_at);
 `,
   },
+  {
+    id: "0009_issue_photos",
+    sql: `
+-- Optional photos on an academic problem (up to 3, each already shrunk by the browser). Stored in the database so they follow the same
+-- backup and access rules as the problem; only the mentor who owns the problem can read them.
+CREATE TABLE issue_photos (
+  id         TEXT PRIMARY KEY,
+  issue_id   TEXT NOT NULL REFERENCES academic_issues(id) ON DELETE CASCADE,
+  mentor_id  TEXT NOT NULL REFERENCES profiles(id),
+  mime       TEXT NOT NULL CHECK (mime IN ('image/jpeg','image/png','image/webp')),
+  bytes      BLOB NOT NULL,
+  size       INTEGER NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX idx_issue_photos_issue ON issue_photos(issue_id);
+`,
+  },
 ];

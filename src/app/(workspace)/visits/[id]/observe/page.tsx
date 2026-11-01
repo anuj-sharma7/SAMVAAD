@@ -8,6 +8,8 @@ import { VisitHeader } from "@/components/visit-shell";
 import { getSchoolCheck } from "@/lib/services/school-check";
 import { problemCount } from "@/lib/school-check";
 import { Card, LinkButton } from "@/components/ui";
+import { listIssues } from "@/lib/services/mentor-help";
+import { MentorHelpCard } from "./mentor-help-card";
 import { ObservationManager } from "./observation-manager";
 
 export async function generateMetadata() {
@@ -33,6 +35,7 @@ export default async function ObservePage({ params }: { params: Promise<{ id: st
   const filled = check.updated_at !== null;
   const n = problemCount(check.answers);
   const checkOpen = visit.status === "in_progress" || visit.status === "pending_review";
+  const openProblems = listIssues(db(), actor).items.filter((i) => i.school_id === visit.school_id && i.status !== "resolved").length;
 
   return (
     <>
@@ -47,6 +50,7 @@ export default async function ObservePage({ params }: { params: Promise<{ id: st
           <LinkButton href={`/visits/${id}/school-check`} variant={filled ? "secondary" : "accent"}>{filled ? t("check.openCard.edit") : t("check.openCard.open")}</LinkButton>
         </Card>
       )}
+      {checkOpen && <MentorHelpCard t={t} visitId={id} schoolId={visit.school_id} grade={visit.grade} subject={visit.subject} openProblems={openProblems} />}
       <ObservationManager visitId={id} status={visit.status} observations={observations} rubric={rubric} locked={locked} lockReason={lockReason} />
     </>
   );

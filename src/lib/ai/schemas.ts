@@ -109,7 +109,8 @@ export type AiTask =
   | { task: "demonstration"; input: DemonstrationTaskInput }
   | { task: "questions"; input: QuestionsTaskInput }
   | { task: "review"; input: ReviewTaskInput }
-  | { task: "issue"; input: IssueTaskInput };
+  | { task: "issue"; input: IssueTaskInput }
+  | { task: "coach"; input: CoachTaskInput };
 
 // ---- mentor help: question generation, review and problem suggestions -----------------------
 
@@ -169,4 +170,24 @@ export interface IssueTaskInput {
   grade: number | null;
   subject: string | null;
   description: string;
+}
+
+// ---- coaching conversation advice ------------------------------------------------------------
+
+export const coachOutputSchema = z.object({
+  opening_line: z.string().trim().min(5).max(400),
+  tips: z.array(z.string().trim().min(5).max(300)).min(1).max(6),
+  if_disagrees: z.string().trim().min(5).max(400),
+  close_with: z.string().trim().min(5).max(400),
+  watch_outs: z.array(z.string().trim().min(5).max(300)).max(4).default([]),
+});
+export type CoachOutput = z.infer<typeof coachOutputSchema>;
+
+export interface CoachTaskInput {
+  language: Lang;
+  grade: number;
+  subject: string;
+  card: { strength: string; priority_practice: string; next_step: string; ask_question: string; describe_statement: string; ask_again_question: string };
+  /** Wording checks that did not pass (ids from `coach/checks.ts`). */
+  weak_checks: string[];
 }

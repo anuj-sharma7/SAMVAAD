@@ -20,11 +20,11 @@ const OUTCOME_TONE: Record<Outcome, string> = {
 };
 
 /** Question generator + tap-to-answer + AI review. `mode` picks the form: class/subject, or mid-day meal / school ground topic. */
-export function QuestionRunner({ mode, initial, recent }: { mode: "subject" | "place"; initial: HelpSession | null; recent: RecentSet[] }) {
+export function QuestionRunner({ mode, initial, recent, defaults, keepQuery = "" }: { mode: "subject" | "place"; initial: HelpSession | null; recent: RecentSet[]; defaults?: { grade?: number; subject?: HelpSubject }; keepQuery?: string }) {
   const { t } = useI18n();
   const toast = useToast();
-  const [grade, setGrade] = useState(initial?.grade ?? 3);
-  const [subject, setSubject] = useState<HelpSubject>((initial?.subject as HelpSubject) ?? "Hindi");
+  const [grade, setGrade] = useState(initial?.grade ?? defaults?.grade ?? 3);
+  const [subject, setSubject] = useState<HelpSubject>((initial?.subject as HelpSubject) ?? defaults?.subject ?? "Hindi");
   const [topic, setTopic] = useState<string>(initial?.topic ?? "menu");
   const [count, setCount] = useState(5);
   const [session, setSession] = useState<HelpSession | null>(initial);
@@ -128,7 +128,7 @@ export function QuestionRunner({ mode, initial, recent }: { mode: "subject" | "p
                 <li key={r.id} className="flex items-center gap-3 px-5 py-3 text-sm">
                   <span className="min-w-0 flex-1 truncate font-medium">{labelOf(r)}</span>
                   {r.reviewed && <Chip tone="teal">{t("mhelp.q.reviewed")}</Chip>}
-                  <a className="text-teal-700 underline" href={`?s=${r.id}`}>{t("mhelp.q.open")}</a>
+                  <a className="text-teal-700 underline" href={`?s=${r.id}${keepQuery}`}>{t("mhelp.q.open")}</a>
                 </li>
               ))}
             </ul>

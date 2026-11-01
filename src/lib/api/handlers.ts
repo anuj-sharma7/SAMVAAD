@@ -12,7 +12,8 @@ import { assignMentor, createSchool, getSchool, listSchools, schoolExtras } from
 import { createVisit, getVisitDetail, listVisits, transitionVisit, updateVisit, visitProgress } from "../services/visits";
 import { addObservation, decideTags, deleteObservation, listObservations, updateObservation } from "../services/observations";
 import { getSchoolCheck, saveSchoolCheck } from "../services/school-check";
-import { createIssue, generateQuestions, getIssue, getSession, listIssues, listSessions, resuggestIssue, reviewSession, updateIssue } from "../services/mentor-help";
+import { coachAdvice } from "../services/coaching";
+import { addIssuePhoto, deleteIssuePhoto, getIssuePhoto, createIssue, generateQuestions, getIssue, getSession, listIssues, listSessions, resuggestIssue, reviewSession, updateIssue } from "../services/mentor-help";
 import { approveFeedback, editFeedback, generateFeedback, getCurrentFeedback, listFeedbackHistory, rejectFeedback } from "../services/feedback";
 import { approveDemonstration, editDemonstration, generateDemonstration, getCurrentDemonstration } from "../services/demonstrations";
 import { createCommitment, getCommitment, listCommitments, reviewCommitment, suggestCommitment, updateCommitment } from "../services/commitments";
@@ -119,6 +120,13 @@ route("POST", "/help/issues", async (c) => createIssue(c.db, c.actor, await c.js
 route("GET", "/help/issues/:id", (c) => getIssue(c.db, c.actor, c.params.id));
 route("PATCH", "/help/issues/:id", async (c) => updateIssue(c.db, c.actor, c.params.id, await c.json()));
 route("POST", "/help/issues/:id/suggest", async (c) => resuggestIssue(c.db, c.actor, c.params.id, await c.json().catch(() => ({}))), 200, LIMITS.ai);
+route("POST", "/help/issues/:id/photos", async (c) => addIssuePhoto(c.db, c.actor, c.params.id, await c.json()), 201);
+route("GET", "/help/photos/:id", (c) => {
+  const p = getIssuePhoto(c.db, c.actor, c.params.id);
+  // Private user content: never cached or sniffed, and the response is locked down in case it is ever opened directly.
+  return new Response(Buffer.from(p.bytes), { headers: { "content-type": p.mime, "cache-control": "private, no-store", "content-security-policy": "default-src 'none'; sandbox", "content-disposition": "inline" } });
+});
+route("DELETE", "/help/photos/:id", (c) => deleteIssuePhoto(c.db, c.actor, c.params.id));
 route("GET", "/help/sessions", (c) => listSessions(c.db, c.actor, { kind: c.query.get("kind") }));
 route("POST", "/help/sessions", async (c) => generateQuestions(c.db, c.actor, await c.json()), 201, LIMITS.ai);
 route("GET", "/help/sessions/:id", (c) => getSession(c.db, c.actor, c.params.id));
@@ -130,6 +138,7 @@ route("GET", "/visits/:id/feedback", (c) => ({
   history: listFeedbackHistory(c.db, c.actor, c.params.id),
   provider: providerStatus(),
 }));
+route("POST", "/feedback/:id/coach-advice", async (c) => coachAdvice(c.db, c.actor, c.params.id, await c.json().catch(() => ({}))), 200, LIMITS.ai);
 route("POST", "/visits/:id/feedback", async (c) => {
   const body = await c.json();
   const { value } = await withIdempotency(c.db, c.actor, `feedback:${c.params.id}`, c.idempotencyKey, () => generateFeedback(c.db, c.actor, c.params.id, body));

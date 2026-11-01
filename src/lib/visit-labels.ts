@@ -1,7 +1,7 @@
 /** Display helpers for stored English visit values. The stored value never changes; only the label is translated. */
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS"] as const;
+export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS", "Science", "SocialScience", "Sanskrit"] as const;
 export const PURPOSES = ["Routine academic support visit", "Follow-up on a previous coaching commitment", "FLN practice observation", "New teacher support"] as const;
 
 const PURPOSE_KEY: Record<string, string> = {

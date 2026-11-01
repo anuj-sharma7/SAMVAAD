@@ -6,7 +6,7 @@ import { CHECK_SECTION_IDS, EXTRA, validOptionIds } from "../school-check";
  * a mistake while still offline, instead of when the record is rejected later. The server remains the authority: tests in
  * tests/offline-validation.test.ts check that what passes here also passes the server schemas.
  */
-export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS"] as const;
+export const SUBJECTS = ["Hindi", "English", "Mathematics", "EVS", "Science", "SocialScience", "Sanskrit"] as const;
 
 const blank = (max: number) => z.string().trim().max(max).optional().or(z.literal("")).transform((v) => (v ? v : undefined));
 

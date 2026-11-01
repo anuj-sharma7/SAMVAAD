@@ -52,19 +52,31 @@ export interface AcademicIssue {
   status: IssueStatus;
   resolution_note: string;
   suggestion: IssueSuggestion | null;
+  /** Optional photos, newest last. Fetch the image from /help/photos/:id. */
+  photos: { id: string; size: number }[];
   is_simulated: boolean;
   created_at: string;
   updated_at: string;
   resolved_at: string | null;
 }
 
-interface IssueRaw extends Omit<AcademicIssue, "suggestion" | "is_simulated"> { suggestion: string; is_simulated: number }
+interface IssueRaw extends Omit<AcademicIssue, "suggestion" | "is_simulated" | "photos"> { suggestion: string; is_simulated: number }
+
+function photosOf(db: Db, ids: string[]): Map<string, { id: string; size: number }[]> {
+  const out = new Map<string, { id: string; size: number }[]>();
+  if (ids.length === 0) return out;
+  const rows = all<{ id: string; issue_id: string; size: number }>(
+    db, `SELECT id, issue_id, size FROM issue_photos WHERE issue_id IN (${ids.map(() => "?").join(",")}) ORDER BY created_at`, ...ids,
+  );
+  for (const r of rows) out.set(r.issue_id, [...(out.get(r.issue_id) ?? []), { id: r.id, size: r.size }]);
+  return out;
+}
 
 const ISSUE_SELECT = `SELECT i.*, s.name AS school_name FROM academic_issues i LEFT JOIN schools s ON s.id = i.school_id`;
 
-function mapIssue(r: IssueRaw): AcademicIssue {
+function mapIssue(r: IssueRaw, photos: AcademicIssue["photos"] = []): AcademicIssue {
   const sug = parseJson<Partial<IssueSuggestion>>(r.suggestion, {});
-  return { ...r, suggestion: sug.suggestions?.length && sug.first_step ? (sug as IssueSuggestion) : null, is_simulated: !!r.is_simulated };
+  return { ...r, suggestion: sug.suggestions?.length && sug.first_step ? (sug as IssueSuggestion) : null, photos, is_simulated: !!r.is_simulated };
 }
 
 const gradeField = z.coerce.number().int().refine((g) => (HELP_GRADES as readonly number[]).includes(g), "Class must be 1 to 8");
@@ -124,7 +136,7 @@ export function getIssue(db: Db, actor: Actor, id: string): AcademicIssue {
   requireRole(actor, "help:use");
   const row = get<IssueRaw>(db, `${ISSUE_SELECT} WHERE i.id = ? AND i.mentor_id = ?`, id, actor.id);
   if (!row) throw notFound("Problem");
-  return mapIssue(row);
+  return mapIssue(row, photosOf(db, [id]).get(id));
 }
 
 export interface IssueSummary {
@@ -144,7 +156,8 @@ export function listIssues(db: Db, actor: Actor, filter: { status?: string | nul
     summary.by_status[r.status] += r.n;
     summary.by_category[r.category] = (summary.by_category[r.category] ?? 0) + r.n;
   }
-  return { items: rows.map(mapIssue), summary };
+  const photos = photosOf(db, rows.map((r) => r.id));
+  return { items: rows.map((r) => mapIssue(r, photos.get(r.id))), summary };
 }
 
 export const updateIssueSchema = z.object({
@@ -329,4 +342,60 @@ export async function reviewSession(db: Db, actor: Actor, id: string, input: unk
     audit(db, actor, "help_review.generated", "help_session", id, { kind: session.kind, good: items.filter((x) => x.outcome === "good").length, some: items.filter((x) => x.outcome === "some").length, weak: items.filter((x) => x.outcome === "weak").length });
   });
   return getSession(db, actor, id);
+}
+
+// ---- photos on a problem ---------------------------------------------------------------------
+
+export const MAX_PHOTOS_PER_ISSUE = 3;
+/** Binary size cap per photo. The browser shrinks photos first; base64 of this still fits the 256 KiB request limit. */
+export const MAX_PHOTO_BYTES = 180_000;
+type PhotoMime = "image/jpeg" | "image/png" | "image/webp";
+
+/** The real type from the first bytes, so a renamed or mislabelled file is refused whatever the client says. */
+export function sniffImage(b: Uint8Array): PhotoMime | null {
+  if (b.length > 12 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "image/jpeg";
+  if (b.length > 12 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 && b[4] === 0x0d && b[5] === 0x0a && b[6] === 0x1a && b[7] === 0x0a) return "image/png";
+  if (b.length > 12 && String.fromCharCode(...b.slice(0, 4)) === "RIFF" && String.fromCharCode(...b.slice(8, 12)) === "WEBP") return "image/webp";
+  return null;
+}
+
+export const addPhotoSchema = z.object({ data_base64: z.string().min(16).max(260_000) });
+
+export function addIssuePhoto(db: Db, actor: Actor, issueId: string, input: unknown): AcademicIssue {
+  getIssue(db, actor, issueId); // ownership check
+  const d = addPhotoSchema.parse(input);
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(d.data_base64)) throw invalid("The photo is not valid base64 data");
+  const bytes = Buffer.from(d.data_base64, "base64");
+  if (bytes.length > MAX_PHOTO_BYTES) throw new AppError(413, "photo_too_large", `The photo is larger than ${Math.round(MAX_PHOTO_BYTES / 1000)} KB after shrinking. Try a smaller picture.`);
+  const mime = sniffImage(bytes);
+  if (!mime) throw new AppError(415, "unsupported_image", "Only JPEG, PNG or WebP photos are accepted.");
+  const count = get<{ n: number }>(db, "SELECT count(*) AS n FROM issue_photos WHERE issue_id = ?", issueId)!.n;
+  if (count >= MAX_PHOTOS_PER_ISSUE) throw conflict("photo_limit", `A problem can have up to ${MAX_PHOTOS_PER_ISSUE} photos.`);
+  const id = newId();
+  const ts = nowIso();
+  transaction(db, () => {
+    run(db, "INSERT INTO issue_photos (id, issue_id, mentor_id, mime, bytes, size, created_at) VALUES (?,?,?,?,?,?,?)", id, issueId, actor.id, mime, bytes, bytes.length, ts);
+    run(db, "UPDATE academic_issues SET updated_at = ? WHERE id = ?", ts, issueId);
+    audit(db, actor, "help_photo.added", "academic_issue", issueId, { size: bytes.length, mime });
+  });
+  return getIssue(db, actor, issueId);
+}
+
+export function getIssuePhoto(db: Db, actor: Actor, photoId: string): { mime: string; bytes: Uint8Array } {
+  requireRole(actor, "help:use");
+  const row = get<{ mime: string; bytes: Uint8Array }>(db, "SELECT mime, bytes FROM issue_photos WHERE id = ? AND mentor_id = ?", photoId, actor.id);
+  if (!row) throw notFound("Photo");
+  return row;
+}
+
+export function deleteIssuePhoto(db: Db, actor: Actor, photoId: string): AcademicIssue {
+  requireRole(actor, "help:use");
+  const row = get<{ issue_id: string }>(db, "SELECT issue_id FROM issue_photos WHERE id = ? AND mentor_id = ?", photoId, actor.id);
+  if (!row) throw notFound("Photo");
+  transaction(db, () => {
+    run(db, "DELETE FROM issue_photos WHERE id = ?", photoId);
+    run(db, "UPDATE academic_issues SET updated_at = ? WHERE id = ?", nowIso(), row.issue_id);
+    audit(db, actor, "help_photo.removed", "academic_issue", row.issue_id, {});
+  });
+  return getIssue(db, actor, row.issue_id);
 }

@@ -1,5 +1,6 @@
 import type { AiProvider, AiRequest, AiResponse } from "./provider";
 import type { CardContext, DemonstrationTaskInput, FeedbackTaskInput } from "./schemas";
+import { composeCoach } from "../coach/compose";
 import { composeIssueSuggestion, composeQuestions, composeReview } from "../help/compose";
 
 /**
@@ -104,6 +105,7 @@ export const demoProvider: AiProvider = {
       : t.task === "demonstration" ? composeDemonstration(t.input)
       : t.task === "questions" ? composeQuestions(t.input)
       : t.task === "review" ? composeReview(t.input)
+      : t.task === "coach" ? composeCoach(t.input)
       : composeIssueSuggestion(t.input);
     return { json, provider: "demo", model: null, simulated: true };
   },
