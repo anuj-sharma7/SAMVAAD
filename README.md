@@ -211,15 +211,16 @@ flowchart LR
 | **Visit workflow** | Plan, observe, draft feedback, approve, demonstrate, commit, follow up, report; enforced state machine | Working, tested end to end |
 | **Guided input** | Tap-to-answer questions with "something else", and **voice typing** (Hindi and English) | Working (voice needs a connection) |
 | **School check** | Seven areas: learning, building, mid-day meal, toilets and water, records, teachers, safety, plus a free note | Web, offline and Android |
-| **Mentor Help** | Academic problems (status, photos, instant AI suggestion); **class 1–8 × 6 subjects** question sets with AI review; mid-day meal and school-ground question sets; opens from a visit's Observe page with class, subject and school filled in | Web |
+| **Mentor Help** | Academic problems (status, photos, instant AI suggestion); **class 1–8 × 6 subjects** question sets with AI review; mid-day meal and school-ground question sets; opens from a visit's Observe page with class, subject and school filled in; a question set can be copied as text or printed | Web |
 | **Coaching guide** | Live wording check on the feedback card and conversation advice (how to start, what to say if the teacher disagrees, how to close) | Web |
+| **First-time tours** | A skippable 4-step welcome on the sign-in page for new visitors, and a 7-step tour inside the app for mentors that rings the menu item it is talking about (replayable from Help) | Working, English and Hindi |
 | **Practice library** | Approved practice cards with versions, review workflow and verbatim NIPUN Bharat excerpts | Working |
 | **Public context** | Real ASER and UDISE+ data with source, period and limits, kept separate from visit data | Working |
 | **Field mode** | Record with no internet; outbox with idempotent sync and conflict handling | Web PWA and Android debug build |
 | **Reports** | Filled from stored records, mentor review, finalize, print / PDF, CSV export, one-page teacher summary | Working |
 | **Hindi / English** | Whole interface in both; Hindi is everyday Hinglish (2,127 UI strings) | Working, **Hindi not yet reviewed by a native-speaker educator** |
 
-**Subjects offered in Mentor Help:** Hindi, English, Mathematics, Science, Social Science, Sanskrit (Social Science and Sanskrit from class 3). Visits can also be planned for these subjects.
+**Subjects offered in Mentor Help:** Hindi, English, Mathematics, Science, Social Science, Sanskrit (Social Science and Sanskrit from class 3). A visit can cover **several subjects or all of them** ("survey all"): the first subject chosen is the main one, the others are stored beside it and shown on the visit.
 
 ---
 
