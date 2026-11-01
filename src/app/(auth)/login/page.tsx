@@ -10,6 +10,7 @@ import { Notice } from "@/components/ui";
 import { ToastProvider } from "@/components/toast";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getI18n } from "@/lib/i18n/server";
+import { APP_RELEASE, apkSizeLabel } from "@/lib/app-release";
 
 export async function generateMetadata() {
   const { t } = await getI18n();
@@ -51,14 +52,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </ol>
             <div className="mt-8">
               <a
-                href="/downloads/SAMVAAD.apk"
-                download="SAMVAAD.apk"
+                href={APP_RELEASE.url}
+                download={APP_RELEASE.fileName}
                 className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-[15px] font-semibold text-white hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <Download size={18} aria-hidden />
                 {t("login.downloadApp")}
               </a>
-              <p className="mt-2 max-w-md text-[13px] text-ink-100/75">{t("login.downloadHint")}</p>
+              <p className="mt-2 max-w-md text-[13px] text-ink-100/75">{t("login.downloadHint", { version: APP_RELEASE.version, size: apkSizeLabel() })}</p>
+              <p className="mt-1 text-[13px]"><a href="/download" className="text-teal-100 underline hover:text-white">{t("login.downloadMore")}</a></p>
             </div>
           </div>
           <p className="max-w-xl text-sm text-ink-100/75">
@@ -70,8 +72,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <div className="w-full max-w-md">
             <div className="mb-6 flex items-center justify-between gap-3">
               <a
-                href="/downloads/SAMVAAD.apk"
-                download="SAMVAAD.apk"
+                href={APP_RELEASE.url}
+                download={APP_RELEASE.fileName}
                 className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
               >
                 <Download size={16} aria-hidden />
