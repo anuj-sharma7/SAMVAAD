@@ -43,6 +43,7 @@ function NavList({ role, onNavigate }: { role: Role; onNavigate?: () => void }) 
           <Link
             key={n.href}
             href={n.href}
+            data-tour={n.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(

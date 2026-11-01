@@ -19,11 +19,13 @@ export function FirstRunTour({ role }: { role: Role }) {
   const steps = stepsFor(role);
   const ref = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   const open = useCallback(() => {
     setStep(0);
+    setIsOpen(true);
     if (ref.current && !ref.current.open) ref.current.showModal();
-  }, [setStep]);
+  }, [setStep, setIsOpen]);
   const close = useCallback(() => {
     try { localStorage.setItem(KEY, "seen"); } catch { /* private mode: the tour just shows again next time */ }
     ref.current?.close();
@@ -37,13 +39,24 @@ export function FirstRunTour({ role }: { role: Role }) {
     return () => { clearTimeout(timer); window.removeEventListener(TOUR_EVENT, open); };
   }, [open]);
 
+  // When a step talks about a menu item, ring that item (on a wide screen where the menu is visible; on a phone it is in a closed drawer).
+  const target = steps[step].target;
+  useEffect(() => {
+    if (!isOpen || !target) return;
+    const el = [...document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`)].find((e) => e.offsetParent !== null);
+    if (!el) return;
+    el.setAttribute("data-tour-active", "true");
+    el.scrollIntoView({ block: "nearest" });
+    return () => el.removeAttribute("data-tour-active");
+  }, [isOpen, target]);
+
   const id = steps[step].id;
   const last = step === steps.length - 1;
   return (
     <dialog
       ref={ref}
       aria-labelledby="tour-title"
-      onClose={() => { try { localStorage.setItem(KEY, "seen"); } catch { /* ignore */ } }}
+      onClose={() => { setIsOpen(false); try { localStorage.setItem(KEY, "seen"); } catch { /* ignore */ } }}
       className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-2xl border border-line bg-card p-0 text-ink-900 shadow-xl backdrop:bg-ink-900/50"
     >
       <div className="space-y-4 p-6">

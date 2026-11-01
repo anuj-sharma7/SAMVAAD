@@ -131,3 +131,12 @@ body {
   animation: shimmer 1.3s infinite linear;
   border-radius: 6px;
 }
+
+/* The menu item that the first-run tour is talking about. */
+[data-tour-active="true"] {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 7px rgba(251, 191, 36, 0.35);
+  position: relative;
+  z-index: 1;
+}
