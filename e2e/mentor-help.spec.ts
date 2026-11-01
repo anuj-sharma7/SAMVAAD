@@ -166,3 +166,30 @@ test("the Observe page offers the Mentor Help helpers with this visit's class, s
   const a11y = await new AxeBuilder({ page }).analyze();
   expect(a11y.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
 });
+
+test("a question set can be copied as plain text and printed", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.addInitScript(() => {
+    localStorage.setItem("samvaad.tour.v1", "seen");
+    (window as unknown as { __printed: number }).__printed = 0;
+    window.print = () => { (window as unknown as { __printed: number }).__printed += 1; };
+  });
+  await signIn(page);
+  await page.goto("/mentor-help/questions");
+  await page.getByLabel("Class", { exact: true }).selectOption("3");
+  await page.getByLabel("Subject").selectOption("Mathematics");
+  await page.getByRole("button", { name: "Make questions" }).click();
+  await expect(page.getByText("Ask the children").first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Copy as text" }).click();
+  await expect(page.getByText("Copied. Paste it in WhatsApp or notes.")).toBeVisible();
+  // the Windows clipboard turns line breaks into CRLF
+  const text = (await page.evaluate(() => navigator.clipboard.readText())).replaceAll("\r\n", "\n");
+  expect(text).toMatch(/^Class 3 · Maths\n/);
+  expect(text).toContain("1. ");
+  expect(text).toContain("(Ask the children)");
+  expect(text).toContain("A good answer sounds like:");
+
+  await page.getByRole("button", { name: "Print or save as PDF" }).click();
+  expect(await page.evaluate(() => (window as unknown as { __printed: number }).__printed)).toBe(1);
+});
