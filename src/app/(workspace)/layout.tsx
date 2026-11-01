@@ -10,7 +10,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
   const { t, locale } = await getI18n();
   return (
     <ToastProvider>
-      <FirstRunTour />
+      <FirstRunTour role={actor.role} />
       <Sidebar name={actor.displayName} role={actor.role} accountId={actor.id} />
       <div className="lg:pl-60">
         <DemoBanner />

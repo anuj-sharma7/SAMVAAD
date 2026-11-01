@@ -160,7 +160,7 @@ test("first-run tour: appears once, is skippable by keyboard, closes with Escape
   await page.goto("/help");
   await page.getByRole("button", { name: /Show the quick tour again|छोटा परिचय फिर से देखें/ }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: /^(Next|आगे)$/ }).click();
+  for (let i = 0; i < 6; i++) await page.getByRole("button", { name: /^(Next|आगे)$/ }).click(); // a mentor sees 7 steps
   await page.getByRole("button", { name: /Start using SAMVAAD|संवाद इस्तेमाल करना शुरू करें/ }).click();
   await expect(page.getByRole("dialog")).toBeHidden();
 });
