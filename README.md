@@ -63,7 +63,8 @@ For CRPs, BRPs, ARPs and NIPUN mentors · Rajasthan-first · Hindi (everyday Hin
 |---|---|
 | **Hosted app** | **https://samvaad-fl55.onrender.com/** |
 | **Health check** | https://samvaad-fl55.onrender.com/api/v1/health |
-| **Android app (debug APK)** | https://samvaad-fl55.onrender.com/downloads/SAMVAAD.apk (also the **Download app** button on the login page) |
+| **Android app: latest version page** | **https://samvaad-fl55.onrender.com/download** (version, size, SHA-256 checksum, install steps) |
+| **Android app (debug APK, v0.5.0)** | https://samvaad-fl55.onrender.com/downloads/SAMVAAD.apk (also the **Download app** button on the login page) |
 | **How to sign in** | Pick a persona on the login page. There are **no passwords**: this is a demo picker. |
 | **Language** | Hindi is the default; switch with the **English / हिन्दी** buttons. |
 
@@ -798,7 +799,7 @@ Not ready for real data: see [Limitations](#limitations-and-what-we-do-not-claim
 
 ## 19. Native Android app
 
-A **Kotlin + Jetpack Compose** app (package `org.samvaad.app`) talks to the hosted API and has its own offline SQLite outbox using the same sync protocol. It lives in a **separate project** (not in this repository). A **debug-signed APK (v0.5.0)** is offered from the login page: **https://samvaad-fl55.onrender.com/downloads/SAMVAAD.apk**.
+A **Kotlin + Jetpack Compose** app (package `org.samvaad.app`) talks to the hosted API and has its own offline SQLite outbox using the same sync protocol. It lives in a **separate project** (not in this repository). A **debug-signed APK (v0.5.0)** is offered from the login page and from the public page **https://samvaad-fl55.onrender.com/download** (version, size, SHA-256 checksum and install steps). Direct file: **https://samvaad-fl55.onrender.com/downloads/SAMVAAD.apk**. The version, size and checksum shown come from `src/lib/app-release.ts`, and a test fails if they do not match the real file.
 
 Honest status: it is verified by compilation and by protocol smoke scripts against the live API. **It has never been run on a real device by the authors**, the offline SQLite code has not been exercised, and it has no voice input. Treat it as a test build; a signed release build is on the roadmap.
 
