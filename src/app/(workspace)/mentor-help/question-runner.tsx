@@ -8,6 +8,7 @@ import { useToast } from "@/components/toast";
 import { Button, Card, CardHeader, Chip, Notice, cn } from "@/components/ui";
 import { Field, Select, Textarea } from "@/components/forms";
 import { SimulatedBadge } from "@/components/ui-i18n";
+import { PrintButton } from "@/components/print-button";
 import { GROUND_TOPICS, HELP_GRADES, MEAL_TOPICS, subjectsForGrade, type HelpSubject, type Outcome } from "@/lib/help/catalog";
 import { questionSetText } from "@/lib/help/share-text";
 import type { HelpSession } from "@/lib/services/mentor-help";
@@ -84,7 +85,7 @@ export function QuestionRunner({ mode, initial, recent, defaults, keepQuery = ""
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
-      <div className="space-y-6">
+      <div className="no-print space-y-6">
         <Card>
           <CardHeader title={mode === "subject" ? t("mhelp.q.title") : t("mhelp.meal.title")} />
           <form className="space-y-4 px-5 py-5" onSubmit={(e) => { e.preventDefault(); void generate(); }}>
@@ -162,6 +163,7 @@ export function QuestionRunner({ mode, initial, recent, defaults, keepQuery = ""
 
             <div className="no-print flex flex-wrap gap-2">
               <Button type="button" variant="secondary" size="sm" onClick={() => void copyText()}><Copy size={14} aria-hidden /> {t("mhelp.q.copy")}</Button>
+              <PrintButton label={t("mhelp.q.print")} />
             </div>
 
             <ol className="space-y-3">
