@@ -4,7 +4,7 @@ import { db, requireActor } from "@/lib/server/context";
 import { listVisits } from "@/lib/services/visits";
 import { fmtDate, fmtTime, VISIT_STATUS_LABEL, visitStatusKey } from "@/lib/format";
 import { getI18n } from "@/lib/i18n/server";
-import { classLabel } from "@/lib/visit-labels";
+import { classSubjectsLabel } from "@/lib/visit-subjects";
 import { Button, Card, Chip, EmptyState, LinkButton, PageHeader, Pagination, VisitStatusChip } from "@/components/ui";
 import { Input, Select } from "@/components/forms";
 
@@ -74,7 +74,7 @@ export default async function VisitsPage({ searchParams }: { searchParams: Promi
                       <div className="text-[12px] text-ink-600">{fmtTime(v.scheduled_at, locale)}</div>
                     </td>
                     <td className="px-4 py-3.5">{v.school_name}</td>
-                    <td className="px-4 py-3.5">{classLabel(t, v.grade, v.subject)}</td>
+                    <td className="px-4 py-3.5">{classSubjectsLabel(t, v.grade, v.subject, v.extra_subjects)}</td>
                     <td className="px-4 py-3.5 text-ink-700">{isMentor ? v.teacher_alias : v.mentor_name}</td>
                     <td className="px-4 py-3.5"><VisitStatusChip status={v.status} /></td>
                     <td className="px-4 py-3.5">

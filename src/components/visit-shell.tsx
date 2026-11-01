@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { cn, PageHeader, VisitStatusChip } from "./ui";
 import { fmtDate, fmtTime } from "@/lib/format";
 import { getI18n } from "@/lib/i18n/server";
-import { classLabel } from "@/lib/visit-labels";
+import { classSubjectsLabel } from "@/lib/visit-subjects";
 import type { SchoolRow, VisitRow } from "@/lib/types";
 
 const TABS = [
@@ -49,7 +49,7 @@ export async function VisitHeader({
           description ?? (
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span>{fmtDate(visit.scheduled_at, locale)}, {fmtTime(visit.scheduled_at, locale)}</span>
-              <span>{classLabel(t, visit.grade, visit.subject)}</span>
+              <span>{classSubjectsLabel(t, visit.grade, visit.subject, visit.extra_subjects)}</span>
               <span>{t("visits.shell.teacher", { alias: visit.teacher_alias })}</span>
               <VisitStatusChip status={visit.status} />
             </span>

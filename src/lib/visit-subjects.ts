@@ -44,3 +44,6 @@ export function subjectsLabel(t: T, subject: string, extraJson: string | null | 
   const list = visitSubjects(subject, extraJson);
   return coversAllSubjects(list) ? t("visits.subject.all") : list.map((s) => subjectLabel(t, s)).join(", ");
 }
+
+/** "Grade 3 · Hindi, English" for a visit that covers several subjects. */
+export const classSubjectsLabel = (t: T, grade: number | string, subject: string, extraJson: string | null | undefined) => `${t("visits.grade", { grade })} · ${subjectsLabel(t, subject, extraJson)}`;

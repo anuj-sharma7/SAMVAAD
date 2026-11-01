@@ -7,6 +7,7 @@ import { getI18n } from "@/lib/i18n/server";
 import { commitmentStatusKey, fmtDate, fmtDateTime } from "@/lib/format";
 import { Card, CardHeader, Chip, DefinitionRow, LinkButton, Notice, PageHeader } from "@/components/ui";
 import { PrintButton } from "@/components/print-button";
+import { subjectsLabel } from "@/lib/visit-subjects";
 
 export async function generateMetadata() {
   const { t } = await getI18n();
@@ -43,7 +44,7 @@ export default async function BriefPage({ params }: { params: Promise<{ id: stri
         <dl className="divide-y divide-line px-5">
           <DefinitionRow label={t("brief.visit.school")}>{v.school_name}</DefinitionRow>
           <DefinitionRow label={t("brief.visit.date")}>{fmtDateTime(v.scheduled_at, locale)}</DefinitionRow>
-          <DefinitionRow label={t("brief.visit.class")}>{t("brief.visit.classValue", { grade: v.grade, subject: v.subject })}</DefinitionRow>
+          <DefinitionRow label={t("brief.visit.class")}>{t("brief.visit.classValue", { grade: v.grade, subject: subjectsLabel(t, v.subject, v.extra_subjects) })}</DefinitionRow>
           <DefinitionRow label={t("brief.visit.teacher")}>{v.teacher_alias}</DefinitionRow>
           <DefinitionRow label={t("brief.visit.purpose")}>{v.purpose}</DefinitionRow>
           {v.coaching_focus && <DefinitionRow label={t("brief.visit.focus")}>{v.coaching_focus}</DefinitionRow>}
