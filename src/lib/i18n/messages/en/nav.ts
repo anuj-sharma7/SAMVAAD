@@ -10,6 +10,7 @@ const m = {
   "nav.practiceLibrary": "Practice Library",
   "nav.settings": "Settings",
   "nav.help": "Help",
+  "nav.mentorHelp": "Mentor Help",
   "nav.primary": "Primary",
   "nav.open": "Open navigation",
   "nav.close": "Close navigation",

@@ -12,6 +12,7 @@ const m: Record<keyof typeof en, string> = {
   "nav.practiceLibrary": "अभ्यास लाइब्रेरी",
   "nav.settings": "सेटिंग",
   "nav.help": "मदद",
+  "nav.mentorHelp": "मेंटर सहायता",
   "nav.primary": "मुख्य मेन्यू",
   "nav.open": "मेन्यू खोलें",
   "nav.close": "मेन्यू बंद करें",

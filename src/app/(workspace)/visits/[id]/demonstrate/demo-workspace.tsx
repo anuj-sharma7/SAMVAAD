@@ -28,7 +28,7 @@ type DemoProps = { visitId: string; visitLanguage: "en" | "hi"; locked: boolean;
 function DemoWorkspaceInner({ visitId, visitLanguage, locked, feedbackApproved, cards, current, ai }: DemoProps) {
   const { t, locale } = useI18n();
   const { run, pending, error } = useAction();
-  const [lang, setLang] = useState<"en" | "hi">(current?.language ?? visitLanguage);
+  const [lang, setLang] = useState<"en" | "hi">(current?.language ?? (locale === "hi" ? "hi" : visitLanguage));
   const [minutes, setMinutes] = useState(String(current?.duration_minutes ?? 5));
   const [cardId, setCardId] = useState(cards[0]?.id ?? "");
   const [editing, setEditing] = useState(false);

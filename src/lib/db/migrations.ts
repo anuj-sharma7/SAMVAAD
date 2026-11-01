@@ -526,4 +526,52 @@ CREATE TABLE school_checks (
 );
 `,
   },
+  {
+    id: "0008_mentor_help",
+    sql: `
+-- Mentor help. academic_issues: problems a mentor logs (reading, numeracy, attendance...) with a status and an AI suggestion.
+-- help_sessions: a generated set of questions (subject by class, mid-day meal, school ground) plus the mentor's tapped outcomes and the AI review.
+-- Neither table has a score or rating column and neither names a child or teacher.
+CREATE TABLE academic_issues (
+  id              TEXT PRIMARY KEY,
+  mentor_id       TEXT NOT NULL REFERENCES profiles(id),
+  school_id       TEXT REFERENCES schools(id),
+  category        TEXT NOT NULL CHECK (category IN ('reading','writing','numeracy','attendance','material','teaching','assessment','language','other')),
+  grade           INTEGER CHECK (grade BETWEEN 1 AND 8),
+  subject         TEXT,
+  description     TEXT NOT NULL CHECK (length(description) BETWEEN 3 AND 800),
+  status          TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','in_progress','resolved')),
+  resolution_note TEXT NOT NULL DEFAULT '',
+  suggestion      TEXT NOT NULL DEFAULT '{}',
+  provider        TEXT,
+  model           TEXT,
+  is_simulated    INTEGER NOT NULL DEFAULT 1,
+  created_at      TEXT NOT NULL,
+  updated_at      TEXT NOT NULL,
+  resolved_at     TEXT
+);
+CREATE INDEX idx_academic_issues_mentor ON academic_issues(mentor_id, status, updated_at);
+
+CREATE TABLE help_sessions (
+  id           TEXT PRIMARY KEY,
+  mentor_id    TEXT NOT NULL REFERENCES profiles(id),
+  kind         TEXT NOT NULL CHECK (kind IN ('subject','meal','ground')),
+  grade        INTEGER CHECK (grade BETWEEN 1 AND 8),
+  subject      TEXT,
+  topic        TEXT,
+  language     TEXT NOT NULL CHECK (language IN ('en','hi')),
+  questions    TEXT NOT NULL,
+  tip          TEXT NOT NULL DEFAULT '',
+  outcomes     TEXT NOT NULL DEFAULT '{}',
+  note         TEXT NOT NULL DEFAULT '',
+  review       TEXT,
+  provider     TEXT NOT NULL,
+  model        TEXT,
+  is_simulated INTEGER NOT NULL DEFAULT 1,
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL
+);
+CREATE INDEX idx_help_sessions_mentor ON help_sessions(mentor_id, kind, created_at);
+`,
+  },
 ];

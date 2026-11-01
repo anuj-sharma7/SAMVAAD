@@ -28,7 +28,7 @@ export function createAnthropicProvider(opts: { apiKey: string; model: string; b
           },
           body: JSON.stringify({
             model: opts.model,
-            max_tokens: 1500,
+            max_tokens: req.maxTokens ?? 1500,
             temperature: 0.2,
             system: req.system,
             messages: [{ role: "user", content: req.prompt }],

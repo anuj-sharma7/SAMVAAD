@@ -106,4 +106,67 @@ export interface DemonstrationTaskInput {
 
 export type AiTask =
   | { task: "feedback"; input: FeedbackTaskInput }
-  | { task: "demonstration"; input: DemonstrationTaskInput };
+  | { task: "demonstration"; input: DemonstrationTaskInput }
+  | { task: "questions"; input: QuestionsTaskInput }
+  | { task: "review"; input: ReviewTaskInput }
+  | { task: "issue"; input: IssueTaskInput };
+
+// ---- mentor help: question generation, review and problem suggestions -----------------------
+
+export const questionsOutputSchema = z.object({
+  questions: z
+    .array(
+      z.object({
+        q: z.string().trim().min(5).max(300),
+        hint: z.string().trim().max(300).default(""),
+        who: z.enum(["students", "cook", "teacher", "head", "smc"]).default("students"),
+        fix: z.string().trim().max(300).default(""),
+      }),
+    )
+    .min(1)
+    .max(12),
+  tip: z.string().trim().max(400).default(""),
+});
+export type QuestionsOutput = z.infer<typeof questionsOutputSchema>;
+
+export const reviewOutputSchema = z.object({
+  summary: z.string().trim().min(5).max(500),
+  suggestions: z.array(z.object({ q: z.string().trim().max(300).default(""), text: z.string().trim().min(5).max(400) })).min(1).max(12),
+  next_step: z.string().trim().min(5).max(400),
+});
+export type ReviewOutput = z.infer<typeof reviewOutputSchema>;
+
+export const issueSuggestionSchema = z.object({
+  suggestions: z.array(z.string().trim().min(5).max(400)).min(1).max(5),
+  first_step: z.string().trim().min(5).max(400),
+});
+export type IssueSuggestion = z.infer<typeof issueSuggestionSchema>;
+
+export type HelpKind = "subject" | "meal" | "ground";
+
+export interface QuestionsTaskInput {
+  language: Lang;
+  kind: HelpKind;
+  grade: number | null;
+  subject: string | null;
+  topic: string | null;
+  count: number;
+}
+
+export interface ReviewTaskInput {
+  language: Lang;
+  kind: HelpKind;
+  grade: number | null;
+  subject: string | null;
+  topic: string | null;
+  items: { q: string; hint: string; fix: string; outcome: "good" | "some" | "weak" }[];
+  note: string;
+}
+
+export interface IssueTaskInput {
+  language: Lang;
+  category: string;
+  grade: number | null;
+  subject: string | null;
+  description: string;
+}

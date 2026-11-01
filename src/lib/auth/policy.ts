@@ -19,6 +19,7 @@ export type Action =
   | "visit:create"
   | "visit:read_content"
   | "visit:write"
+  | "help:use"
   | "card:read_approved"
   | "card:read_all"
   | "card:write"
@@ -35,6 +36,7 @@ const MATRIX: Record<Action, Role[]> = {
   "visit:create": ["mentor"],
   "visit:read_content": ["mentor"],
   "visit:write": ["mentor"],
+  "help:use": ["mentor"],
   "card:read_approved": ["mentor", "supervisor", "diet_admin"],
   "card:read_all": ["diet_admin"],
   "card:write": ["diet_admin"],

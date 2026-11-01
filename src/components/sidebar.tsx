@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   BookOpenCheck, CalendarCheck, Globe2, CircleHelp, ClipboardList, FileText, LayoutDashboard, Library, LogOut, Menu,
-  MessageSquareText, Presentation, School, Settings, WifiOff, X,
+  MessageSquareText, Presentation, Sparkles, School, Settings, WifiOff, X,
 } from "lucide-react";
 import { cn } from "./ui";
 import { LanguageSwitcher } from "./language-switcher";
+import { Logo } from "./logo";
 import { api } from "@/lib/client/api";
 import { roleKey } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/client";
@@ -22,6 +23,7 @@ const NAV: { href: string; labelKey: string; icon: typeof School; roles: Role[] 
   { href: "/field", labelKey: "nav.fieldMode", icon: WifiOff, roles: ["mentor"] },
   { href: "/feedback", labelKey: "nav.feedback", icon: MessageSquareText, roles: ["mentor"] },
   { href: "/demonstrate", labelKey: "nav.demonstrations", icon: Presentation, roles: ["mentor"] },
+  { href: "/mentor-help", labelKey: "nav.mentorHelp", icon: Sparkles, roles: ["mentor"] },
   { href: "/follow-ups", labelKey: "nav.followUps", icon: CalendarCheck, roles: ["mentor"] },
   { href: "/reports", labelKey: "nav.reports", icon: FileText, roles: ["mentor"] },
   { href: "/public-data", labelKey: "nav.publicContext", icon: Globe2, roles: ["mentor", "supervisor", "diet_admin"] },
@@ -61,9 +63,7 @@ function Brand() {
   const { t } = useI18n();
   return (
     <Link href="/dashboard" className="flex items-center gap-2.5 px-6 py-5 text-white">
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white">
-        <BookOpenCheck size={18} aria-hidden />
-      </span>
+      <Logo size={32} />
       <span>
         <span className="block text-[17px] font-semibold leading-none tracking-tight">SAMVAAD</span>
         <span lang="hi" className="mt-1 block text-[11px] leading-none text-ink-100/75">

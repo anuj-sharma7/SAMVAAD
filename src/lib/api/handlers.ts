@@ -12,6 +12,7 @@ import { assignMentor, createSchool, getSchool, listSchools, schoolExtras } from
 import { createVisit, getVisitDetail, listVisits, transitionVisit, updateVisit, visitProgress } from "../services/visits";
 import { addObservation, decideTags, deleteObservation, listObservations, updateObservation } from "../services/observations";
 import { getSchoolCheck, saveSchoolCheck } from "../services/school-check";
+import { createIssue, generateQuestions, getIssue, getSession, listIssues, listSessions, resuggestIssue, reviewSession, updateIssue } from "../services/mentor-help";
 import { approveFeedback, editFeedback, generateFeedback, getCurrentFeedback, listFeedbackHistory, rejectFeedback } from "../services/feedback";
 import { approveDemonstration, editDemonstration, generateDemonstration, getCurrentDemonstration } from "../services/demonstrations";
 import { createCommitment, getCommitment, listCommitments, reviewCommitment, suggestCommitment, updateCommitment } from "../services/commitments";
@@ -111,6 +112,17 @@ route("POST", "/observations/:id/tags", async (c) => decideTags(c.db, c.actor, c
 // ---- school check (problem list by area) -------------------------------------------------------
 route("GET", "/visits/:id/school-check", (c) => getSchoolCheck(c.db, c.actor, c.params.id));
 route("PUT", "/visits/:id/school-check", async (c) => saveSchoolCheck(c.db, c.actor, c.params.id, await c.json()));
+
+// ---- mentor help: academic problems, question sets, mid-day meal and ground checks ---------------
+route("GET", "/help/issues", (c) => listIssues(c.db, c.actor, { status: c.query.get("status") }));
+route("POST", "/help/issues", async (c) => createIssue(c.db, c.actor, await c.json()), 201, LIMITS.ai);
+route("GET", "/help/issues/:id", (c) => getIssue(c.db, c.actor, c.params.id));
+route("PATCH", "/help/issues/:id", async (c) => updateIssue(c.db, c.actor, c.params.id, await c.json()));
+route("POST", "/help/issues/:id/suggest", async (c) => resuggestIssue(c.db, c.actor, c.params.id, await c.json().catch(() => ({}))), 200, LIMITS.ai);
+route("GET", "/help/sessions", (c) => listSessions(c.db, c.actor, { kind: c.query.get("kind") }));
+route("POST", "/help/sessions", async (c) => generateQuestions(c.db, c.actor, await c.json()), 201, LIMITS.ai);
+route("GET", "/help/sessions/:id", (c) => getSession(c.db, c.actor, c.params.id));
+route("POST", "/help/sessions/:id/review", async (c) => reviewSession(c.db, c.actor, c.params.id, await c.json()), 200, LIMITS.ai);
 
 // ---- feedback (E3) -----------------------------------------------------------------------------
 route("GET", "/visits/:id/feedback", (c) => ({

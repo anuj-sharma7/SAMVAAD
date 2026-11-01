@@ -18,6 +18,7 @@ import en_brief from "./en/brief";
 import en_field from "./en/field";
 import en_sync from "./en/sync";
 import en_check from "./en/check";
+import en_mhelp from "./en/mhelp";
 import hi_common from "./hi/common";
 import hi_nav from "./hi/nav";
 import hi_login from "./hi/login";
@@ -38,8 +39,9 @@ import hi_brief from "./hi/brief";
 import hi_field from "./hi/field";
 import hi_sync from "./hi/sync";
 import hi_check from "./hi/check";
+import hi_mhelp from "./hi/mhelp";
 
-export const NAMESPACES = ["common", "nav", "login", "settings", "dashboard", "schools", "visits", "observe", "feedback", "demo", "report", "followups", "library", "publicdata", "help", "errors", "brief", "field", "sync", "check"] as const;
+export const NAMESPACES = ["common", "nav", "login", "settings", "dashboard", "schools", "visits", "observe", "feedback", "demo", "report", "followups", "library", "publicdata", "help", "errors", "brief", "field", "sync", "check", "mhelp"] as const;
 
 export const en = {
   ...en_common,
@@ -62,6 +64,7 @@ export const en = {
   ...en_field,
   ...en_sync,
   ...en_check,
+  ...en_mhelp,
 };
 
 export type MessageKey = keyof typeof en;
@@ -87,6 +90,7 @@ export const hi: Record<MessageKey, string> = {
   ...hi_field,
   ...hi_sync,
   ...hi_check,
+  ...hi_mhelp,
 };
 
 /** Per-namespace dictionaries, used by tests to detect duplicate keys across namespaces. */
@@ -111,4 +115,5 @@ export const BY_NAMESPACE = {
   field: { en: en_field as Record<string, string>, hi: hi_field as Record<string, string> },
   sync: { en: en_sync as Record<string, string>, hi: hi_sync as Record<string, string> },
   check: { en: en_check as Record<string, string>, hi: hi_check as Record<string, string> },
+  mhelp: { en: en_mhelp as Record<string, string>, hi: hi_mhelp as Record<string, string> },
 };

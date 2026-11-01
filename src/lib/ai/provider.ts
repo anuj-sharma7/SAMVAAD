@@ -26,6 +26,8 @@ export interface AiRequest {
   prompt: string;
   /** Hard ceiling for the call. Providers must honour it. */
   timeoutMs: number;
+  /** Output ceiling; longer tasks (question sets) ask for more. Defaults to 1500. */
+  maxTokens?: number;
 }
 
 export interface AiResponse {

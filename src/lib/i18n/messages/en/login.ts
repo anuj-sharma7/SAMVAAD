@@ -5,6 +5,8 @@ const m = {
   "login.intro": "SAMVAAD helps CRPs, BRPs, ARPs and NIPUN mentors move from what they observe in a classroom to one specific, practical next step with the teacher, grounded in an approved practice library, and checks it at the next visit.",
   "login.workflowLabel": "The SAMVAAD workflow",
   "login.principle": "The AI drafts; the mentor decides. SAMVAAD never scores or ranks teachers, and every suggestion cites an approved practice card.",
+  "login.downloadApp": "Download app",
+  "login.downloadHint": "Android app (APK, v0.5.0 test build, about 9 MB). Allow installs from this source when your phone asks.",
   "login.title": "Choose your role",
   "login.subtitle": "Tap a role to start. These are fictional demo people.",
   "login.demoNoticeTitle": "Demo access, not production sign-in",

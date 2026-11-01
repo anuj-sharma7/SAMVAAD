@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { BookOpenCheck, ShieldCheck } from "lucide-react";
+import { Download, ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { getActor } from "@/lib/server/context";
 import { demoModeEnabled } from "@/lib/auth/session";
 import { DEMO_USERS } from "@/lib/db/seed";
@@ -27,7 +28,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <main id="main" className="grid min-h-screen grid-cols-[minmax(0,1fr)] lg:grid-cols-[1.05fr_1fr]">
         <section className="relative order-last flex flex-col justify-between bg-ink-900 px-8 py-10 text-white sm:px-14 sm:py-14 lg:order-none">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600"><BookOpenCheck size={22} aria-hidden /></span>
+            <Logo size={48} />
             <div>
               <p className="text-xl font-semibold leading-none tracking-tight">SAMVAAD</p>
               <p lang="hi" className="mt-1 text-xs text-ink-100/75">{t("login.tagline")}</p>
@@ -48,6 +49,17 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                 </li>
               ))}
             </ol>
+            <div className="mt-8">
+              <a
+                href="/downloads/SAMVAAD.apk"
+                download="SAMVAAD.apk"
+                className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-[15px] font-semibold text-white hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <Download size={18} aria-hidden />
+                {t("login.downloadApp")}
+              </a>
+              <p className="mt-2 max-w-md text-[13px] text-ink-100/75">{t("login.downloadHint")}</p>
+            </div>
           </div>
           <p className="max-w-xl text-sm text-ink-100/75">
             {t("login.principle")}
@@ -56,7 +68,17 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
         <section className="flex items-center justify-center px-5 py-8 sm:px-12 sm:py-12">
           <div className="w-full max-w-md">
-            <div className="mb-6 flex justify-end"><LanguageSwitcher tone="light" /></div>
+            <div className="mb-6 flex items-center justify-between gap-3">
+              <a
+                href="/downloads/SAMVAAD.apk"
+                download="SAMVAAD.apk"
+                className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              >
+                <Download size={16} aria-hidden />
+                {t("login.downloadApp")}
+              </a>
+              <LanguageSwitcher tone="light" />
+            </div>
             <h2 className="text-2xl font-semibold tracking-tight">{t("login.title")}</h2>
             <p className="mt-1.5 text-ink-600">{t("login.subtitle")}</p>
 
