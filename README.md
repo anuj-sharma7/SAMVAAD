@@ -886,3 +886,7 @@ Full list: [`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md) and [`docs/l
 [Live demo](https://samvaad-fl55.onrender.com/) · [Android APK](https://samvaad-fl55.onrender.com/downloads/SAMVAAD.apk) · [Health](https://samvaad-fl55.onrender.com/api/v1/health)
 
 </div>
+
+## License
+
+The source code is released under the [MIT License](LICENSE). Third-party public datasets under `data/` remain under their original publishers' terms; see `data/source_registry.csv` for each source's licence note.
